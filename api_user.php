@@ -32,21 +32,21 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO service (name, password, userType, serviceType) VALUES (:name, :password, :userType, :serviceType)";
+    $sql = "INSERT INTO user (username, pass, userType, serviceType) VALUES (:username, :pass, :userType, :serviceType)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['name' => $input['name'], 'password' => $input['password'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType']]);
     echo json_encode(['message' => 'User created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET name = :name, password = :password, userType = :userType, serviceType = :serviceType WHERE id = :id";
+    $sql = "UPDATE user SET username = :username, pass = :pass, userType = :userType, serviceType = :serviceType WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['name' => $input['name'], 'password' => $input['password'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'id' => $input['id']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'id' => $input['id']]);
     echo json_encode(['message' => 'User updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
-    $sql = "DELETE FROM service WHERE id = :id";
+    $sql = "DELETE FROM user WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
     echo json_encode(['message' => 'User deleted successfully']);
