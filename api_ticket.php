@@ -24,7 +24,7 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
-    $sql = "SELECT * FROM teller";
+    $sql = "SELECT * FROM ticket";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -32,23 +32,23 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO service (serviceType, serviceCode) VALUES (:serviceType, :serviceCode)";
+    $sql = "INSERT INTO ticket (timeCreated, number, serviceType, userAssigned, stationNumber, timeTaken, timeDone, status, log, priority, priorityType, printStatus) VALUES (:serviceType, :serviceCode)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode']]);
-    echo json_encode(['message' => 'User created successfully']);
+    $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus']]);
+    echo json_encode(['message' => 'Ticket created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET serviceType = :serviceType, serviceCode = :serviceCode WHERE id = :id";
+    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceType = :serviceType, userAssigned = :userAssigned, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'id' => $input['id']]);
-    echo json_encode(['message' => 'User updated successfully']);
+    $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus'], 'id' => $input['id']]);
+    echo json_encode(['message' => 'Ticket updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
-    $sql = "DELETE FROM service WHERE id = :id";
+    $sql = "DELETE FROM ticket WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
-    echo json_encode(['message' => 'User deleted successfully']);
+    echo json_encode(['message' => 'Ticket deleted successfully']);
 }
 ?>

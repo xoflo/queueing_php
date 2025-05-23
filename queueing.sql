@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 23, 2025 at 01:30 PM
+-- Generation Time: May 23, 2025 at 03:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,19 +33,28 @@ CREATE TABLE `service` (
   `serviceCode` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `service`
+--
+
+INSERT INTO `service` (`id`, `serviceType`, `serviceCode`) VALUES
+(3, 'Evaluation', 'E'),
+(4, 'Releasing', 'R');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `teller`
+-- Table structure for table `station`
 --
 
-CREATE TABLE `teller` (
+CREATE TABLE `station` (
   `id` int(11) NOT NULL,
-  `tellerNumber` int(11) NOT NULL,
+  `stationNumber` int(11) NOT NULL,
   `inSession` int(11) NOT NULL,
   `userInSession` text NOT NULL,
   `serviceType` int(11) NOT NULL,
-  `ticketServing` text NOT NULL
+  `ticketServing` text NOT NULL,
+  `stationName` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -60,13 +69,14 @@ CREATE TABLE `ticket` (
   `number` int(11) NOT NULL,
   `serviceType` text NOT NULL,
   `userAssigned` text NOT NULL,
-  `tellerNumber` int(11) NOT NULL,
+  `stationNumber` int(11) NOT NULL,
   `timeTaken` date NOT NULL,
   `timeDone` date NOT NULL,
   `status` text NOT NULL,
   `log` text NOT NULL,
   `priority` int(11) NOT NULL,
-  `priorityType` int(11) NOT NULL
+  `priorityType` int(11) NOT NULL,
+  `printStatus` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -76,12 +86,18 @@ CREATE TABLE `ticket` (
 --
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
-  `password` text NOT NULL,
+  `pass` text NOT NULL,
   `userType` text NOT NULL,
   `serviceType` text NOT NULL,
-  `name` text NOT NULL
+  `username` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`pass`, `userType`, `serviceType`, `username`) VALUES
+('password', 'Admin', 'Evaluation', 'user1');
 
 --
 -- Indexes for dumped tables
@@ -94,21 +110,15 @@ ALTER TABLE `service`
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Indexes for table `teller`
+-- Indexes for table `station`
 --
-ALTER TABLE `teller`
+ALTER TABLE `station`
   ADD UNIQUE KEY `id` (`id`);
 
 --
 -- Indexes for table `ticket`
 --
 ALTER TABLE `ticket`
-  ADD UNIQUE KEY `id` (`id`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
   ADD UNIQUE KEY `id` (`id`);
 
 --
@@ -119,24 +129,18 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `teller`
+-- AUTO_INCREMENT for table `station`
 --
-ALTER TABLE `teller`
+ALTER TABLE `station`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `user`
---
-ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
