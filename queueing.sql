@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 23, 2025 at 03:00 PM
+-- Generation Time: May 23, 2025 at 03:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,7 +39,8 @@ CREATE TABLE `service` (
 
 INSERT INTO `service` (`id`, `serviceType`, `serviceCode`) VALUES
 (3, 'Evaluation', 'E'),
-(4, 'Releasing', 'R');
+(4, 'Releasing', 'R'),
+(5, 'Payment', 'P');
 
 -- --------------------------------------------------------
 
@@ -75,7 +76,7 @@ CREATE TABLE `ticket` (
   `status` text NOT NULL,
   `log` text NOT NULL,
   `priority` int(11) NOT NULL,
-  `priorityType` int(11) NOT NULL,
+  `priorityType` text NOT NULL,
   `printStatus` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -86,6 +87,7 @@ CREATE TABLE `ticket` (
 --
 
 CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
   `pass` text NOT NULL,
   `userType` text NOT NULL,
   `serviceType` text NOT NULL,
@@ -96,8 +98,9 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`pass`, `userType`, `serviceType`, `username`) VALUES
-('password', 'Admin', 'Evaluation', 'user1');
+INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`) VALUES
+(1, 'password', 'Admin', 'Evaluation', 'user1'),
+(2, 'pass', 'Staff', 'Evaluation', 'Dongkoy');
 
 --
 -- Indexes for dumped tables
@@ -122,6 +125,12 @@ ALTER TABLE `ticket`
   ADD UNIQUE KEY `id` (`id`);
 
 --
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD UNIQUE KEY `id` (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -129,7 +138,7 @@ ALTER TABLE `ticket`
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `station`
@@ -142,6 +151,12 @@ ALTER TABLE `station`
 --
 ALTER TABLE `ticket`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
