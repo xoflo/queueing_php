@@ -34,7 +34,7 @@ function handleGet($pdo) {
 function handlePost($pdo, $input) {
     $sql = "INSERT INTO station (sessionPing, stationNumber, inSession, userInSession, serviceType, ticketServing, stationName) VALUES (:sessionPing, :stationNumber, :inSession, :userInSession, :serviceType, :ticketServing, :stationName)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['sessionPing' => $input['sessionPing'], ['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName']]);
+    $stmt->execute(['sessionPing' => $input['sessionPing'], 'stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName']]);
     echo json_encode(['message' => 'Station created successfully']);
 }
 
