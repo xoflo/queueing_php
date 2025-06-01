@@ -41,7 +41,7 @@ function handlePost($pdo, $input) {
 function handlePut($pdo, $input) {
     $sql = "UPDATE station SET sessionPing = :sessionPing,stationNumber = :stationNumber, inSession = :inSession, userInSession = :userInSession, serviceType = :serviceType, ticketServing = :ticketServing, stationName = :stationName WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['sessionPing' => $input['sessionPing'],['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName'], 'id' => $input['id']]);
+    $stmt->execute(['sessionPing' => $input['sessionPing'], 'stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Station updated successfully']);
 }
 
