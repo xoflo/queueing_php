@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 23, 2025 at 03:19 PM
+-- Generation Time: May 24, 2025 at 01:31 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -99,8 +99,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`) VALUES
-(1, 'password', 'Admin', 'Evaluation', 'user1'),
-(2, 'pass', 'Staff', 'Evaluation', 'Dongkoy');
+(1, 'staff', 'Staff', 'Evaluation', 'staff'),
+(2, 'admin', 'Admin', 'Evaluation', 'admin');
 
 --
 -- Indexes for dumped tables

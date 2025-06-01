@@ -32,7 +32,7 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO ticket (timeCreated, number, serviceType, userAssigned, stationNumber, timeTaken, timeDone, status, log, priority, priorityType, printStatus) VALUES (:serviceType, :serviceCode)";
+    $sql = "INSERT INTO ticket (timeCreated, number, serviceType, userAssigned, stationNumber, timeTaken, timeDone, status, log, priority, priorityType, printStatus) VALUES (:timeCreated, :number, :serviceType, :userAssigned, :stationNumber, :timeTaken, :timeDone, :status, :log, :priority, :priorityType, :printStatus)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus']]);
     echo json_encode(['message' => 'Ticket created successfully']);

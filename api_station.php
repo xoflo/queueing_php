@@ -32,16 +32,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO station (stationNumber, inSession, userInSession, serviceType, ticketServing, stationName) VALUES (:stationNumber, :inSession, :userInSession, :serviceType, :ticketServing, :stationName)";
+    $sql = "INSERT INTO station (sessionPing, stationNumber, inSession, userInSession, serviceType, ticketServing, stationName) VALUES (:sessionPing, :stationNumber, :inSession, :userInSession, :serviceType, :ticketServing, :stationName)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName']]);
+    $stmt->execute(['sessionPing' => $input['sessionPing'], ['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName']]);
     echo json_encode(['message' => 'Station created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE station SET stationNumber = :stationNumber, inSession = :inSession, userInSession = :userInSession, serviceType = :serviceType, ticketServing = :ticketServing, stationName = :stationName WHERE id = :id";
+    $sql = "UPDATE station SET sessionPing = :sessionPing,stationNumber = :stationNumber, inSession = :inSession, userInSession = :userInSession, serviceType = :serviceType, ticketServing = :ticketServing, stationName = :stationName WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName'], 'id' => $input['id']]);
+    $stmt->execute(['sessionPing' => $input['sessionPing'],['stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'serviceType' => $input['serviceType'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Station updated successfully']);
 }
 
