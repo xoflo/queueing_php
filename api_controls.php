@@ -32,16 +32,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO service (serviceType, serviceCode, assignedGroup) VALUES (:serviceType, :serviceCode, :assignedGroup)";
+    $sql = "INSERT INTO service (serviceType, serviceCode) VALUES (:serviceType, :serviceCode)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], , 'assignedGroup' => $input['assignedGroup']]);
+    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode']]);
     echo json_encode(['message' => 'Service created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET serviceType = :serviceType, serviceCode = :serviceCode, assignedGroup = :assignedGroup WHERE id = :id";
+    $sql = "UPDATE service SET serviceType = :serviceType, serviceCode = :serviceCode WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'assignedGroup' => $input['assignedGroup'], 'id' => $input['id']]);
+    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Service updated successfully']);
 }
 

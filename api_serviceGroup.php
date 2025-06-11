@@ -32,23 +32,23 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO service (serviceType, serviceCode, assignedGroup) VALUES (:serviceType, :serviceCode, :assignedGroup)";
+    $sql = "INSERT INTO servicegroup (name, assignedGroup) VALUES (:name, :assignedGroup)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], , 'assignedGroup' => $input['assignedGroup']]);
-    echo json_encode(['message' => 'Service created successfully']);
+    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup']]);
+    echo json_encode(['message' => 'Service Group created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET serviceType = :serviceType, serviceCode = :serviceCode, assignedGroup = :assignedGroup WHERE id = :id";
+    $sql = "UPDATE service SET name = :name, assignedGroup = :assignedGroup WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'assignedGroup' => $input['assignedGroup'], 'id' => $input['id']]);
-    echo json_encode(['message' => 'Service updated successfully']);
+    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'id' => $input['id']]);
+    echo json_encode(['message' => 'Service Group updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
     $sql = "DELETE FROM service WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
-    echo json_encode(['message' => 'Service deleted successfully']);
+    echo json_encode(['message' => 'Service Group deleted successfully']);
 }
 ?>
