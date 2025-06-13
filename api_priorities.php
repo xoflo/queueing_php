@@ -24,7 +24,7 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
-    $sql = "SELECT * FROM controls";
+    $sql = "SELECT * FROM priorities";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -32,23 +32,23 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO controls (id, controlName, value) VALUES (:id, :controlName, :value)";
+    $sql = "INSERT INTO priorities (id, priorityName) VALUES (:id, :priorityName)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
-    echo json_encode(['message' => 'Control created successfully']);
+    $stmt->execute(['id' => $input['id'], 'priorityName' => $input['priorityName']]);
+    echo json_encode(['message' => 'Priority created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE controls SET id = :id, controlName = :controlName, value = :value WHERE id = :id";
+    $sql = "UPDATE priorities SET priorityName = :priorityName WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
-    echo json_encode(['message' => 'Control updated successfully']);
+    $stmt->execute(['id' => $input['id'], 'priorityName' => $input['priorityName']]);
+    echo json_encode(['message' => 'Priority updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
-    $sql = "DELETE FROM controls WHERE id = :id";
+    $sql = "DELETE FROM priorities WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
-    echo json_encode(['message' => 'Control deleted successfully']);
+    echo json_encode(['message' => 'Priority deleted successfully']);
 }
 ?>

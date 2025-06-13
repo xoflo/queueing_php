@@ -24,7 +24,7 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
-    $sql = "SELECT * FROM service";
+    $sql = "SELECT * FROM controls";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -32,23 +32,23 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO service (serviceType, serviceCode) VALUES (:serviceType, :serviceCode)";
+    $sql = "INSERT INTO controls (id, controlName, value) VALUES (:id, :controlName, :value)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode']]);
-    echo json_encode(['message' => 'Service created successfully']);
+    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
+    echo json_encode(['message' => 'Control created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET serviceType = :serviceType, serviceCode = :serviceCode WHERE id = :id";
+    $sql = "UPDATE controls SET id = :id, controlName = :controlName, value = :value WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'id' => $input['id']]);
-    echo json_encode(['message' => 'Service updated successfully']);
+    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
+    echo json_encode(['message' => 'Control updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
-    $sql = "DELETE FROM service WHERE id = :id";
+    $sql = "DELETE FROM controls WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
-    echo json_encode(['message' => 'Service deleted successfully']);
+    echo json_encode(['message' => 'Control deleted successfully']);
 }
 ?>
