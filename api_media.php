@@ -32,16 +32,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO media (name, file) VALUES (:name, :file)";
+    $sql = "INSERT INTO media (name, link) VALUES (:name, :link)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['name' => $input['name'], 'file' => $input['file']]);
+    $stmt->execute(['name' => $input['name'], 'link' => $input['link']]);
     echo json_encode(['message' => 'Media created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE media SET name = :name, file = :file WHERE id = :id";
+    $sql = "UPDATE media SET name = :name, link = :link WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $input['id'], 'name' => $input['name'], 'file' => $input['file']]);
+    $stmt->execute(['id' => $input['id'], 'name' => $input['name'], 'link' => $input['link']]);
     echo json_encode(['message' => 'Media updated successfully']);
 }
 
