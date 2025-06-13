@@ -24,7 +24,7 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
-    $sql = "SELECT * FROM service";
+    $sql = "SELECT * FROM servicegroup";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,14 +39,14 @@ function handlePost($pdo, $input) {
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE service SET name = :name, assignedGroup = :assignedGroup WHERE id = :id";
+    $sql = "UPDATE servicegroup SET name = :name, assignedGroup = :assignedGroup WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Service Group updated successfully']);
 }
 
 function handleDelete($pdo, $input) {
-    $sql = "DELETE FROM service WHERE id = :id";
+    $sql = "DELETE FROM servicegroup WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $input['id']]);
     echo json_encode(['message' => 'Service Group deleted successfully']);

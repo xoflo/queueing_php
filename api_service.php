@@ -34,7 +34,7 @@ function handleGet($pdo) {
 function handlePost($pdo, $input) {
     $sql = "INSERT INTO service (serviceType, serviceCode, assignedGroup) VALUES (:serviceType, :serviceCode, :assignedGroup)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], , 'assignedGroup' => $input['assignedGroup']]);
+    $stmt->execute(['serviceType' => $input['serviceType'], 'serviceCode' => $input['serviceCode'], 'assignedGroup' => $input['assignedGroup']]);
     echo json_encode(['message' => 'Service created successfully']);
 }
 
