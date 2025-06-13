@@ -32,16 +32,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO user (username, pass, userType, serviceType) VALUES (:username, :pass, :userType, :serviceType)";
+    $sql = "INSERT INTO user (username, pass, userType, serviceType, loggedIn) VALUES (:username, :pass, :userType, :serviceType, :loggedIn)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], loggedIn' => $input['loggedIn']]);
     echo json_encode(['message' => 'User created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE user SET username = :username, pass = :pass, userType = :userType, serviceType = :serviceType WHERE id = :id";
+    $sql = "UPDATE user SET username = :username, pass = :pass, userType = :userType, serviceType = :serviceType, loggedIn = :loggedIn WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'id' => $input['id']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn'], 'id' => $input['id']]);
     echo json_encode(['message' => 'User updated successfully']);
 }
 
