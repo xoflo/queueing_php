@@ -34,7 +34,7 @@ function handleGet($pdo) {
 function handlePost($pdo, $input) {
     $sql = "INSERT INTO user (username, pass, userType, serviceType, loggedIn) VALUES (:username, :pass, :userType, :serviceType, :loggedIn)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], loggedIn' => $input['loggedIn']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn']]);
     echo json_encode(['message' => 'User created successfully']);
 }
 
