@@ -1,26 +1,21 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "video_app");
+header("Access-Control-Allow-Origin: *");
 
-if ($_FILES['file']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/videos/';
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+if (isset($_FILES['file'])) {
+    echo "✅ File received: " . $_FILES['file']['name'] . "\n";
+    echo "Size: " . $_FILES['file']['size'] . " bytes\n";
+
+    $targetDir = "videos/";
+    if (!file_exists($targetDir)) {
+        mkdir($targetDir, 0777, true);
     }
 
-    $filename = basename($_FILES['file']['name']);
-    $target = $uploadDir . $filename;
-
-    if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-        $relPath = "videos/" . $filename;
-        $stmt = $conn->prepare("INSERT INTO videos (name, path) VALUES (?, ?)");
-        $stmt->bind_param("ss", $filename, $relPath);
-        $stmt->execute();
-
-        echo "Success";
+    $targetFile = $targetDir . basename($_FILES["file"]["name"]);
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
+        echo "✅ Saved to: $targetFile";
     } else {
-        echo "Move failed";
+        echo "❌ Failed to move uploaded file.";
     }
 } else {
-    echo "Upload error";
+    echo "❌ No file received!";
 }
-?>
