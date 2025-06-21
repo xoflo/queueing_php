@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 24, 2025 at 01:31 PM
+-- Generation Time: Jun 21, 2025 at 06:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -24,23 +24,104 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `controls`
+--
+
+CREATE TABLE `controls` (
+  `id` int(11) NOT NULL,
+  `controlName` text NOT NULL,
+  `value` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `controls`
+--
+
+INSERT INTO `controls` (`id`, `controlName`, `value`) VALUES
+(1, 'Priority Option', 1),
+(2, 'Ticket Name Option', 1),
+(3, 'Video in Queue Display', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `media`
+--
+
+CREATE TABLE `media` (
+  `name` text NOT NULL,
+  `id` int(11) NOT NULL,
+  `link` longblob DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `media`
+--
+
+INSERT INTO `media` (`name`, `id`, `link`) VALUES
+('Queue Display Video', 1, 0x68747470733a2f2f7777772e796f75747562652e636f6d2f77617463683f763d4a787736466141306a3349);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `priorities`
+--
+
+CREATE TABLE `priorities` (
+  `priorityName` text NOT NULL,
+  `id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `priorities`
+--
+
+INSERT INTO `priorities` (`priorityName`, `id`) VALUES
+('Pregnant', 1),
+('PWD', 2),
+('Senior Citizen', 3);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `service`
 --
 
 CREATE TABLE `service` (
   `id` int(11) NOT NULL,
   `serviceType` text NOT NULL,
-  `serviceCode` text NOT NULL
+  `serviceCode` text NOT NULL,
+  `assignedGroup` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `service`
 --
 
-INSERT INTO `service` (`id`, `serviceType`, `serviceCode`) VALUES
-(3, 'Evaluation', 'E'),
-(4, 'Releasing', 'R'),
-(5, 'Payment', 'P');
+INSERT INTO `service` (`id`, `serviceType`, `serviceCode`, `assignedGroup`) VALUES
+(6, 'Evaluation', 'E', '_MAIN_'),
+(8, 'Releasing', 'R', '_MAIN_'),
+(9, 'Payment', 'P', '_MAIN_'),
+(10, 'Cashier', 'C', '_MAIN_');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `servicegroup`
+--
+
+CREATE TABLE `servicegroup` (
+  `id` int(11) NOT NULL,
+  `name` text NOT NULL,
+  `assignedGroup` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `servicegroup`
+--
+
+INSERT INTO `servicegroup` (`id`, `name`, `assignedGroup`) VALUES
+(5, 'Law 1 Subgroup', 'Law');
 
 -- --------------------------------------------------------
 
@@ -53,10 +134,19 @@ CREATE TABLE `station` (
   `stationNumber` int(11) NOT NULL,
   `inSession` int(11) NOT NULL,
   `userInSession` text NOT NULL,
-  `serviceType` int(11) NOT NULL,
+  `serviceType` text NOT NULL,
   `ticketServing` text NOT NULL,
-  `stationName` text NOT NULL
+  `stationName` text NOT NULL,
+  `sessionPing` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `station`
+--
+
+INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `serviceType`, `ticketServing`, `stationName`, `sessionPing`) VALUES
+(5, 1, 0, '', 'Evaluation', '', 'Teller', ''),
+(6, 2, 0, '', 'Releasing', '', 'Teller', '');
 
 -- --------------------------------------------------------
 
@@ -66,19 +156,30 @@ CREATE TABLE `station` (
 
 CREATE TABLE `ticket` (
   `id` int(11) NOT NULL,
-  `timeCreated` date NOT NULL,
-  `number` int(11) NOT NULL,
+  `timeCreated` text NOT NULL,
+  `number` text NOT NULL,
+  `serviceCode` text NOT NULL,
   `serviceType` text NOT NULL,
-  `userAssigned` text NOT NULL,
-  `stationNumber` int(11) NOT NULL,
-  `timeTaken` date NOT NULL,
-  `timeDone` date NOT NULL,
+  `userAssigned` text DEFAULT NULL,
+  `stationName` text DEFAULT NULL,
+  `stationNumber` int(11) DEFAULT NULL,
+  `timeTaken` text DEFAULT NULL,
+  `timeDone` text DEFAULT NULL,
   `status` text NOT NULL,
   `log` text NOT NULL,
   `priority` int(11) NOT NULL,
   `priorityType` text NOT NULL,
-  `printStatus` int(11) NOT NULL
+  `printStatus` int(11) NOT NULL,
+  `callCheck` int(11) NOT NULL,
+  `ticketName` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ticket`
+--
+
+INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`) VALUES
+(34, '2025-06-19 16:45:20.075', '001', 'E', 'Evaluation', 'staff1', 'Teller', 1, '2025-06-19 16:46:08.685', '', 'Serving', '2025-06-19 16:45:20.075: ticketGenerated, 2025-06-19 16:46:08.685: serving on Teller1 by staff1', 0, 'None', 1, 1, '');
 
 -- --------------------------------------------------------
 
@@ -91,26 +192,53 @@ CREATE TABLE `user` (
   `pass` text NOT NULL,
   `userType` text NOT NULL,
   `serviceType` text NOT NULL,
-  `username` text NOT NULL
+  `username` text NOT NULL,
+  `loggedIn` text DEFAULT NULL,
+  `servicesSet` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`) VALUES
-(1, 'staff', 'Staff', 'Evaluation', 'staff'),
-(2, 'admin', 'Admin', 'Evaluation', 'admin');
+INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`) VALUES
+(2, 'admin', 'Admin', '', 'admin', '2025-06-13 21:43:13.235', NULL),
+(8, 'staff1', 'Staff', '[Evaluation, Cashier]', 'staff1', '2025-06-19 16:46:18.356', '[Evaluation, Cashier]'),
+(9, 'staff', 'Staff', '[Releasing, Payment]', 'staff', '2025-06-19 16:45:59.552', '[Releasing, Payment]');
 
 --
 -- Indexes for dumped tables
 --
 
 --
+-- Indexes for table `controls`
+--
+ALTER TABLE `controls`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `media`
+--
+ALTER TABLE `media`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `priorities`
+--
+ALTER TABLE `priorities`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `service`
 --
 ALTER TABLE `service`
   ADD UNIQUE KEY `id` (`id`);
+
+--
+-- Indexes for table `servicegroup`
+--
+ALTER TABLE `servicegroup`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `station`
@@ -135,28 +263,52 @@ ALTER TABLE `user`
 --
 
 --
+-- AUTO_INCREMENT for table `controls`
+--
+ALTER TABLE `controls`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `media`
+--
+ALTER TABLE `media`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `priorities`
+--
+ALTER TABLE `priorities`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `servicegroup`
+--
+ALTER TABLE `servicegroup`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `station`
 --
 ALTER TABLE `station`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
