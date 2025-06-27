@@ -36,16 +36,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO controls (id, controlName, value) VALUES (:id, :controlName, :value)";
+    $sql = "INSERT INTO controls (id, controlName, value, other) VALUES (:id, :controlName, :value, :other)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
+    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value'], 'other' => $input['other']]);
     echo json_encode(['message' => 'Control created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE controls SET id = :id, controlName = :controlName, value = :value WHERE id = :id";
+    $sql = "UPDATE controls SET id = :id, controlName = :controlName, value = :value, other = :other WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value']]);
+    $stmt->execute(['id' => $input['id'], 'controlName' => $input['controlName'], 'value' => $input['value'], 'other' => $input['other']]);
     echo json_encode(['message' => 'Control updated successfully']);
 }
 
