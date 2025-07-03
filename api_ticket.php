@@ -43,7 +43,7 @@ function handlePost($pdo, $input) {
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceCode = :serviceCode, serviceType = :serviceType, userAssigned = :userAssigned, stationName = :stationName, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus, callCheck = :callCheck, ticketName = :ticketName WHERE id = :id";
+    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceCode = :serviceCode, serviceType = :serviceType, userAssigned = :userAssigned, stationName = :stationName, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus, callCheck = :callCheck, ticketName = :ticketName, blinker = :blinker  WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceCode' => $input['serviceCode'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationName' => $input['stationName'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus'], 'callCheck' => $input['callCheck'], 'ticketName' => $input['ticketName'], 'blinker' => $input['blinker'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Ticket updated successfully']);
