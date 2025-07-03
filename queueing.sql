@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 21, 2025 at 06:43 AM
+-- Generation Time: Jul 02, 2025 at 11:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -30,17 +30,19 @@ SET time_zone = "+00:00";
 CREATE TABLE `controls` (
   `id` int(11) NOT NULL,
   `controlName` text NOT NULL,
-  `value` int(11) NOT NULL
+  `value` int(11) NOT NULL,
+  `other` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `controls`
 --
 
-INSERT INTO `controls` (`id`, `controlName`, `value`) VALUES
-(1, 'Priority Option', 1),
-(2, 'Ticket Name Option', 1),
-(3, 'Video in Queue Display', 1);
+INSERT INTO `controls` (`id`, `controlName`, `value`, `other`) VALUES
+(1, 'Priority Option', 1, NULL),
+(2, 'Ticket Name Option', 1, NULL),
+(3, 'Video in Queue Display', 1, NULL),
+(4, 'Sliding Text', 1, '                    Office of the Ombudsman for Mindanao                    Welcome to Davao City                    This Text Will Overflow The Field But Not Separated by Enter');
 
 -- --------------------------------------------------------
 
@@ -51,7 +53,7 @@ INSERT INTO `controls` (`id`, `controlName`, `value`) VALUES
 CREATE TABLE `media` (
   `name` text NOT NULL,
   `id` int(11) NOT NULL,
-  `link` longblob DEFAULT NULL
+  `link` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -59,7 +61,8 @@ CREATE TABLE `media` (
 --
 
 INSERT INTO `media` (`name`, `id`, `link`) VALUES
-('Queue Display Video', 1, 0x68747470733a2f2f7777772e796f75747562652e636f6d2f77617463683f763d4a787736466141306a3349);
+('sample.mp4', 3, 'sample.mp4'),
+('sample2.mp4', 4, 'sample2.mp4');
 
 -- --------------------------------------------------------
 
@@ -99,10 +102,17 @@ CREATE TABLE `service` (
 --
 
 INSERT INTO `service` (`id`, `serviceType`, `serviceCode`, `assignedGroup`) VALUES
-(6, 'Evaluation', 'E', '_MAIN_'),
-(8, 'Releasing', 'R', '_MAIN_'),
-(9, 'Payment', 'P', '_MAIN_'),
-(10, 'Cashier', 'C', '_MAIN_');
+(14, 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS ', 'FS', '_MAIN_'),
+(15, 'SUBMISSION OF SALN', 'S', '_MAIN_'),
+(16, 'REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE', 'CG', '_MAIN_'),
+(17, 'REQUEST FOR CASE INFORMATION', 'CI', '_MAIN_'),
+(18, 'FILING OF NEW COMPLAINTS', 'NC', '_MAIN_'),
+(19, 'REQUEST FOR COPY OF SALN', 'CS', '_MAIN_'),
+(20, 'APPLICATION FOR OMB CLEARANCE', 'AC', '_MAIN_'),
+(21, 'PAYMENTS', 'P', '_MAIN_'),
+(22, 'RELEASING OF CHECKS', 'RC', '_MAIN_'),
+(23, 'RELEASING OF CLEARANCE', 'RL', '_MAIN_'),
+(24, 'REQUEST FOR ASSISTANCE', 'RA', '_MAIN_');
 
 -- --------------------------------------------------------
 
@@ -116,13 +126,6 @@ CREATE TABLE `servicegroup` (
   `assignedGroup` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `servicegroup`
---
-
-INSERT INTO `servicegroup` (`id`, `name`, `assignedGroup`) VALUES
-(5, 'Law 1 Subgroup', 'Law');
-
 -- --------------------------------------------------------
 
 --
@@ -131,10 +134,9 @@ INSERT INTO `servicegroup` (`id`, `name`, `assignedGroup`) VALUES
 
 CREATE TABLE `station` (
   `id` int(11) NOT NULL,
-  `stationNumber` int(11) NOT NULL,
+  `stationNumber` int(11) DEFAULT NULL,
   `inSession` int(11) NOT NULL,
   `userInSession` text NOT NULL,
-  `serviceType` text NOT NULL,
   `ticketServing` text NOT NULL,
   `stationName` text NOT NULL,
   `sessionPing` text NOT NULL
@@ -144,9 +146,10 @@ CREATE TABLE `station` (
 -- Dumping data for table `station`
 --
 
-INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `serviceType`, `ticketServing`, `stationName`, `sessionPing`) VALUES
-(5, 1, 0, '', 'Evaluation', '', 'Teller', ''),
-(6, 2, 0, '', 'Releasing', '', 'Teller', '');
+INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`) VALUES
+(5, 1, 0, '', '', 'Teller', ''),
+(6, 2, 0, '', '', 'Teller', ''),
+(10, 0, 0, '', '', 'Station', '');
 
 -- --------------------------------------------------------
 
@@ -179,7 +182,11 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`) VALUES
-(34, '2025-06-19 16:45:20.075', '001', 'E', 'Evaluation', 'staff1', 'Teller', 1, '2025-06-19 16:46:08.685', '', 'Serving', '2025-06-19 16:45:20.075: ticketGenerated, 2025-06-19 16:46:08.685: serving on Teller1 by staff1', 0, 'None', 1, 1, '');
+(59, '2025-06-24 11:19:29.005265', '001', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:21:45.865814', '2025-06-24 11:25:35.449317', 'Done', '2025-06-24 11:19:29.005265: ticketGenerated, 2025-06-24 11:21:45.865814: serving on Teller1 by staff, 2025-06-24 11:25:35.449317: ticket session finished', 0, 'None', 1, 0, ''),
+(60, '2025-06-24 11:19:31.282680', '002', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:25:35.449317', '2025-06-24 11:25:51.410378', 'Done', '2025-06-24 11:19:31.282680: ticketGenerated, 2025-06-24 11:25:35.449317: serving on Teller1 by staff, 2025-06-24 11:25:51.410378: ticket session finished', 0, 'None', 1, 0, ''),
+(61, '2025-06-24 11:19:33.011278', '003', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:25:51.410378', '2025-06-24 11:28:11.919024', 'Done', '2025-06-24 11:19:33.011278: ticketGenerated, 2025-06-24 11:25:51.410378: serving on Teller1 by staff, 2025-06-24 11:28:11.919024: ticket session finished', 0, 'None', 1, 1, ''),
+(62, '2025-06-24 11:19:34.836744', '004', 'E', 'Releasing', 'staff', 'Teller', 1, '2025-06-24 11:28:54.422304', '2025-06-24 12:39:09.854647', 'Done', '2025-06-24 11:19:34.836744: ticketGenerated, 2025-06-24 11:28:11.919024: serving on Teller1 by staff, 2025-06-24 11:28:31.918543: ticket transferred to Releasing, 2025-06-24 11:28:54.422304: serving on Teller1 by staff, 2025-06-24 12:39:09.854647: ticket session finished', 0, 'None', 1, 1, ''),
+(64, '2025-07-01 16:44:25.595', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Teller', 1, '2025-07-02 16:56:44.280', '2025-07-02 16:58:08.932', 'Done', '2025-07-01 16:44:25.595: ticketGenerated, 2025-07-02 16:56:44.280: serving on Teller1 by staff, 2025-07-02 16:58:08.932: ticket session finished', 0, 'None', 1, 1, '');
 
 -- --------------------------------------------------------
 
@@ -202,9 +209,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`) VALUES
-(2, 'admin', 'Admin', '', 'admin', '2025-06-13 21:43:13.235', NULL),
-(8, 'staff1', 'Staff', '[Evaluation, Cashier]', 'staff1', '2025-06-19 16:46:18.356', '[Evaluation, Cashier]'),
-(9, 'staff', 'Staff', '[Releasing, Payment]', 'staff', '2025-06-19 16:45:59.552', '[Releasing, Payment]');
+(2, 'admin', 'Admin', '', 'admin', NULL, ''),
+(11, 'staff', 'Staff', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-02 17:17:16.317', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
 
 --
 -- Indexes for dumped tables
@@ -266,13 +272,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `controls`
 --
 ALTER TABLE `controls`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `media`
 --
 ALTER TABLE `media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `priorities`
@@ -284,31 +290,31 @@ ALTER TABLE `priorities`
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `servicegroup`
 --
 ALTER TABLE `servicegroup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `station`
 --
 ALTER TABLE `station`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
