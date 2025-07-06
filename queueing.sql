@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 02, 2025 at 11:18 AM
+-- Generation Time: Jul 04, 2025 at 11:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -41,7 +41,7 @@ CREATE TABLE `controls` (
 INSERT INTO `controls` (`id`, `controlName`, `value`, `other`) VALUES
 (1, 'Priority Option', 1, NULL),
 (2, 'Ticket Name Option', 1, NULL),
-(3, 'Video in Queue Display', 1, NULL),
+(3, 'Video in Queue Display', 0, NULL),
 (4, 'Sliding Text', 1, '                    Office of the Ombudsman for Mindanao                    Welcome to Davao City                    This Text Will Overflow The Field But Not Separated by Enter');
 
 -- --------------------------------------------------------
@@ -147,7 +147,7 @@ CREATE TABLE `station` (
 --
 
 INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`) VALUES
-(5, 1, 0, '', '', 'Teller', ''),
+(5, 1, 1, 'staff', '', 'Teller', '2025-07-04 17:33:49.276'),
 (6, 2, 0, '', '', 'Teller', ''),
 (10, 0, 0, '', '', 'Station', '');
 
@@ -174,19 +174,16 @@ CREATE TABLE `ticket` (
   `priorityType` text NOT NULL,
   `printStatus` int(11) NOT NULL,
   `callCheck` int(11) NOT NULL,
-  `ticketName` text NOT NULL
+  `ticketName` text NOT NULL,
+  `blinker` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `ticket`
 --
 
-INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`) VALUES
-(59, '2025-06-24 11:19:29.005265', '001', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:21:45.865814', '2025-06-24 11:25:35.449317', 'Done', '2025-06-24 11:19:29.005265: ticketGenerated, 2025-06-24 11:21:45.865814: serving on Teller1 by staff, 2025-06-24 11:25:35.449317: ticket session finished', 0, 'None', 1, 0, ''),
-(60, '2025-06-24 11:19:31.282680', '002', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:25:35.449317', '2025-06-24 11:25:51.410378', 'Done', '2025-06-24 11:19:31.282680: ticketGenerated, 2025-06-24 11:25:35.449317: serving on Teller1 by staff, 2025-06-24 11:25:51.410378: ticket session finished', 0, 'None', 1, 0, ''),
-(61, '2025-06-24 11:19:33.011278', '003', 'E', 'Evaluation', 'staff', 'Teller', 1, '2025-06-24 11:25:51.410378', '2025-06-24 11:28:11.919024', 'Done', '2025-06-24 11:19:33.011278: ticketGenerated, 2025-06-24 11:25:51.410378: serving on Teller1 by staff, 2025-06-24 11:28:11.919024: ticket session finished', 0, 'None', 1, 1, ''),
-(62, '2025-06-24 11:19:34.836744', '004', 'E', 'Releasing', 'staff', 'Teller', 1, '2025-06-24 11:28:54.422304', '2025-06-24 12:39:09.854647', 'Done', '2025-06-24 11:19:34.836744: ticketGenerated, 2025-06-24 11:28:11.919024: serving on Teller1 by staff, 2025-06-24 11:28:31.918543: ticket transferred to Releasing, 2025-06-24 11:28:54.422304: serving on Teller1 by staff, 2025-06-24 12:39:09.854647: ticket session finished', 0, 'None', 1, 1, ''),
-(64, '2025-07-01 16:44:25.595', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Teller', 1, '2025-07-02 16:56:44.280', '2025-07-02 16:58:08.932', 'Done', '2025-07-01 16:44:25.595: ticketGenerated, 2025-07-02 16:56:44.280: serving on Teller1 by staff, 2025-07-02 16:58:08.932: ticket session finished', 0, 'None', 1, 1, '');
+INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`) VALUES
+(68, '2025-07-04 17:31:06.311', '001', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-04 17:31:06.311: ticketGenerated', 0, 'None', 1, 0, '', 0);
 
 -- --------------------------------------------------------
 
@@ -210,7 +207,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`) VALUES
 (2, 'admin', 'Admin', '', 'admin', NULL, ''),
-(11, 'staff', 'Staff', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-02 17:17:16.317', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
+(11, 'staff', 'Staff', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-04 17:33:47.556', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]'),
+(12, 'staff1', 'Staff', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff1', '2025-07-04 17:30:32.671', '[SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
 
 --
 -- Indexes for dumped tables
@@ -308,13 +306,13 @@ ALTER TABLE `station`
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
