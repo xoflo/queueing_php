@@ -28,7 +28,7 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
-    $sql = "SELECT * FROM media";
+    $sql = "SELECT * FROM mediabg";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
