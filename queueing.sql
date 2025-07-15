@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 10, 2025 at 07:35 PM
+-- Generation Time: Jul 11, 2025 at 06:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -41,13 +41,14 @@ CREATE TABLE `controls` (
 INSERT INTO `controls` (`id`, `controlName`, `value`, `other`) VALUES
 (1, 'Priority Option', 1, NULL),
 (2, 'Ticket Name Option', 0, NULL),
-(3, 'Video View (TV)', 0, NULL),
+(3, 'Video View (TV)', 1, NULL),
 (4, 'Sliding Text', 1, '                    Office of the Ombudsman for Mindanao                    happy bday'),
 (5, 'Kiosk Password', 0, 'kiosk'),
-(6, 'RGB Screen (TV)', 1, '30:5:0.7:0'),
-(7, 'RGB Screen (Kiosk)', 1, '0:0:0:1'),
+(6, 'RGB Screen (TV)', 1, '5:30:0.7:0'),
+(7, 'RGB Screen (Kiosk)', 1, '10:0:0:0'),
 (9, 'BG Video (TV)', 1, NULL),
-(10, 'BG Video (Kiosk)', 1, NULL);
+(10, 'BG Video (Kiosk)', 1, NULL),
+(11, 'Staff Inactive Beep', 1, '120');
 
 -- --------------------------------------------------------
 
@@ -170,7 +171,7 @@ CREATE TABLE `station` (
 --
 
 INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`) VALUES
-(5, 1, 0, '', '', 'Window', ''),
+(5, 1, 1, 'staff', '', 'Window', '2025-07-11 12:20:14.253869'),
 (6, 2, 0, '', '', 'Window', ''),
 (10, 3, 0, '', '', 'Window', ''),
 (11, 4, 0, '', '', 'Window', ''),
@@ -210,8 +211,8 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`) VALUES
-(88, '2025-07-08 13:56:04.778297', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Teller', 1, '2025-07-08 17:42:10.128208', '', 'Serving', '2025-07-08 13:56:04.778297: ticketGenerated, 2025-07-08 17:25:03.743172: serving on Teller1 by staff, 2025-07-08 17:27:44.248986: serving on Teller1 by staff, 2025-07-08 17:33:30.934555: serving on Teller1 by staff, 2025-07-08 17:42:10.128208: serving on Teller1 by staff', 0, 'None', 1, 1, '', 1),
-(89, '2025-07-10 14:36:03.957434', '001', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:36:03.957434: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
+(88, '2025-07-11 13:56:04.778297', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-11 12:18:00.731463', '2025-07-11 12:19:45.149601', 'Done', '2025-07-08 13:56:04.778297: ticketGenerated, 2025-07-08 17:25:03.743172: serving on Teller1 by staff, 2025-07-08 17:27:44.248986: serving on Teller1 by staff, 2025-07-08 17:33:30.934555: serving on Teller1 by staff, 2025-07-08 17:42:10.128208: serving on Teller1 by staff, 2025-07-11 12:12:37.897622: serving on Window1 by staff, 2025-07-11 12:18:00.731463: serving on Window1 by staff, 2025-07-11 12:19:45.149601: Ticket Session Finished', 0, 'Regular', 1, 1, '', 1),
+(89, '2025-07-11 14:36:03.957434', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-11 11:34:56.292601', '', 'Pending', '2025-07-10 14:36:03.957434: ticketGenerated, 2025-07-11 11:24:46.877849: serving on Window1 by staff, 2025-07-11 11:34:56.292601: serving on Window1 by staff', 0, 'Pregnant', 1, 1, '', 1),
 (90, '2025-07-10 14:42:46.509561', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:42:46.509561: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
 (91, '2025-07-10 14:47:52.304526', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:47:52.304526: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
 (92, '2025-07-10 14:59:48.590701', '004', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:59:48.590701: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
@@ -245,7 +246,7 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`) VALUES
 (2, 'admin', 'Admin', '', 'admin', NULL, ''),
-(14, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-10 15:49:25.499', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
+(14, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-11 12:20:15.358571', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
 
 --
 -- Indexes for dumped tables
@@ -313,7 +314,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `controls`
 --
 ALTER TABLE `controls`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `media`
