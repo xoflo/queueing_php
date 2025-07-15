@@ -35,16 +35,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO user (username, pass, userType, serviceType, loggedIn, servicesSet) VALUES (:username, :pass, :userType, :serviceType, :loggedIn, :servicesSet)";
+    $sql = "INSERT INTO user (username, pass, userType, serviceType, loggedIn, servicesSet, assignedStation) VALUES (:username, :pass, :userType, :serviceType, :loggedIn, :servicesSet, :assignedStation)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn'], 'servicesSet' => $input['servicesSet']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn'], 'servicesSet' => $input['servicesSet'], 'assignedStation' => $input['assignedStation']]);
     echo json_encode(['message' => 'User created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE user SET username = :username, pass = :pass, userType = :userType, serviceType = :serviceType, loggedIn = :loggedIn, servicesSet = :servicesSet WHERE id = :id";
+    $sql = "UPDATE user SET username = :username, pass = :pass, userType = :userType, serviceType = :serviceType, loggedIn = :loggedIn, servicesSet = :servicesSet, assignedStation = :assignedStation WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn'], 'servicesSet' => $input['servicesSet'], 'id' => $input['id']]);
+    $stmt->execute(['username' => $input['username'], 'pass' => $input['pass'], 'userType' => $input['userType'], 'serviceType' => $input['serviceType'], 'loggedIn' => $input['loggedIn'], 'servicesSet' => $input['servicesSet'], 'assignedStation' => $input['assignedStation'], 'id' => $input['id']]);
     echo json_encode(['message' => 'User updated successfully']);
 }
 
