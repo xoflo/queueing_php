@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 11, 2025 at 06:26 AM
+-- Generation Time: Jul 16, 2025 at 04:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -46,9 +46,10 @@ INSERT INTO `controls` (`id`, `controlName`, `value`, `other`) VALUES
 (5, 'Kiosk Password', 0, 'kiosk'),
 (6, 'RGB Screen (TV)', 1, '5:30:0.7:0'),
 (7, 'RGB Screen (Kiosk)', 1, '10:0:0:0'),
-(9, 'BG Video (TV)', 1, NULL),
-(10, 'BG Video (Kiosk)', 1, NULL),
-(11, 'Staff Inactive Beep', 1, '120');
+(9, 'BG Video (TV)', 0, NULL),
+(12, 'BG Video (Kiosk)', 1, NULL),
+(13, 'Staff Inactive Beep', 1, '60'),
+(14, 'Gender Option', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -67,7 +68,8 @@ CREATE TABLE `media` (
 --
 
 INSERT INTO `media` (`name`, `id`, `link`) VALUES
-('sample1080.mp4', 15, 'sample1080.mp4');
+('sample480.mp4', 17, 'sample480.mp4'),
+('sample720.mp4', 18, 'sample720.mp4');
 
 -- --------------------------------------------------------
 
@@ -86,7 +88,8 @@ CREATE TABLE `mediabg` (
 --
 
 INSERT INTO `mediabg` (`id`, `name`, `link`) VALUES
-(2, 'sample1080.mp4', 'sample1080.mp4');
+(4, 'sample480.mp4', 'sample480.mp4'),
+(5, 'sample720.mp4', 'sample720.mp4');
 
 -- --------------------------------------------------------
 
@@ -118,25 +121,39 @@ CREATE TABLE `service` (
   `id` int(11) NOT NULL,
   `serviceType` text NOT NULL,
   `serviceCode` text NOT NULL,
-  `assignedGroup` text NOT NULL
+  `assignedGroup` text NOT NULL,
+  `timeCreated` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `service`
 --
 
-INSERT INTO `service` (`id`, `serviceType`, `serviceCode`, `assignedGroup`) VALUES
-(14, 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS', 'FS', '_MAIN_'),
-(15, 'SUBMISSION OF SALN', 'S', '_MAIN_'),
-(16, 'REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE', 'CG', '_MAIN_'),
-(17, 'REQUEST FOR CASE INFORMATION', 'CI', '_MAIN_'),
-(18, 'FILING OF NEW COMPLAINTS', 'NC', '_MAIN_'),
-(19, 'REQUEST FOR COPY OF SALN', 'CS', '_MAIN_'),
-(20, 'APPLICATION FOR OMB CLEARANCE', 'AC', '_MAIN_'),
-(21, 'PAYMENTS', 'P', '_MAIN_'),
-(22, 'RELEASING OF CHECKS', 'RC', '_MAIN_'),
-(23, 'RELEASING OF CLEARANCE', 'RL', '_MAIN_'),
-(24, 'REQUEST FOR ASSISTANCE', 'RA', '_MAIN_');
+INSERT INTO `service` (`id`, `serviceType`, `serviceCode`, `assignedGroup`, `timeCreated`) VALUES
+(14, 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS', 'FS', '_MAIN_', NULL),
+(15, 'SUBMISSION OF SALN', 'S', '_MAIN_', NULL),
+(16, 'REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE', 'CG', '_MAIN_', NULL),
+(17, 'REQUEST FOR CASE INFORMATION', 'CI', '_MAIN_', NULL),
+(18, 'FILING OF NEW COMPLAINTS', 'NC', '_MAIN_', NULL),
+(19, 'REQUEST FOR COPY OF SALN', 'CS', '_MAIN_', NULL),
+(20, 'APPLICATION FOR OMB CLEARANCE', 'AC', '_MAIN_', NULL),
+(21, 'PAYMENTS', 'P', '_MAIN_', NULL),
+(22, 'RELEASING OF CHECKS', 'RC', '_MAIN_', NULL),
+(23, 'RELEASING OF CLEARANCE', 'RL', '_MAIN_', NULL),
+(24, 'REQUEST FOR ASSISTANCE', 'RA', '_MAIN_', NULL),
+(27, 'Test1', 'T1', '_MAIN_', NULL),
+(28, 'Test2', 'T2', '_MAIN_', NULL),
+(29, 'Test3', 'T3', '_MAIN_', NULL),
+(30, 'Test4', 'T4', '_MAIN_', NULL),
+(31, 'Test5', 'T5', '_MAIN_', NULL),
+(32, 'Test6', 'T6', '_MAIN_', NULL),
+(33, 'Test7', 'T7', '_MAIN_', NULL),
+(34, 'Test8', 'T8', '_MAIN_', NULL),
+(35, 'Test9', 'T9', '_MAIN_', NULL),
+(36, 'Test10', 'T10', '_MAIN_', NULL),
+(37, 'Test11', 'T11', '_MAIN_', NULL),
+(38, 'Test12', 'T12', '_MAIN_', NULL),
+(39, 'Test13', 'T13', '_MAIN_', NULL);
 
 -- --------------------------------------------------------
 
@@ -147,7 +164,8 @@ INSERT INTO `service` (`id`, `serviceType`, `serviceCode`, `assignedGroup`) VALU
 CREATE TABLE `servicegroup` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
-  `assignedGroup` text NOT NULL
+  `assignedGroup` text NOT NULL,
+  `timeCreated` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -163,21 +181,25 @@ CREATE TABLE `station` (
   `userInSession` text DEFAULT NULL,
   `ticketServing` text DEFAULT NULL,
   `stationName` text NOT NULL,
-  `sessionPing` text DEFAULT NULL
+  `sessionPing` text DEFAULT NULL,
+  `displayIndex` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `station`
 --
 
-INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`) VALUES
-(5, 1, 1, 'staff', '', 'Window', '2025-07-11 12:20:14.253869'),
-(6, 2, 0, '', '', 'Window', ''),
-(10, 3, 0, '', '', 'Window', ''),
-(11, 4, 0, '', '', 'Window', ''),
-(12, 5, 0, '', '', 'Window', ''),
-(13, 6, 0, '', '', 'Window', ''),
-(14, 7, 0, '', '', 'Window', '');
+INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`, `displayIndex`) VALUES
+(18, 1, 0, '', '', 'Window', '', 1),
+(19, 2, 0, '', '', 'Window', '', 2),
+(20, 3, 0, '', '', 'Window', '', 3),
+(21, 4, 0, '', '', 'Window', '', 4),
+(22, 5, 0, '', '', 'Window', '', 5),
+(23, 6, 0, '', '', 'Window', '', 6),
+(24, 7, 0, '', '', 'Window', '', 7),
+(25, 8, 0, '', '', 'Window', '', 8),
+(26, 9, 0, '', '', 'Window', '', 9),
+(27, 10, 0, '', '', 'Window', '', 10);
 
 -- --------------------------------------------------------
 
@@ -203,26 +225,18 @@ CREATE TABLE `ticket` (
   `printStatus` int(11) NOT NULL,
   `callCheck` int(11) NOT NULL,
   `ticketName` text NOT NULL,
-  `blinker` int(11) NOT NULL
+  `blinker` int(11) NOT NULL,
+  `gender` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `ticket`
 --
 
-INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`) VALUES
-(88, '2025-07-11 13:56:04.778297', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-11 12:18:00.731463', '2025-07-11 12:19:45.149601', 'Done', '2025-07-08 13:56:04.778297: ticketGenerated, 2025-07-08 17:25:03.743172: serving on Teller1 by staff, 2025-07-08 17:27:44.248986: serving on Teller1 by staff, 2025-07-08 17:33:30.934555: serving on Teller1 by staff, 2025-07-08 17:42:10.128208: serving on Teller1 by staff, 2025-07-11 12:12:37.897622: serving on Window1 by staff, 2025-07-11 12:18:00.731463: serving on Window1 by staff, 2025-07-11 12:19:45.149601: Ticket Session Finished', 0, 'Regular', 1, 1, '', 1),
-(89, '2025-07-11 14:36:03.957434', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-11 11:34:56.292601', '', 'Pending', '2025-07-10 14:36:03.957434: ticketGenerated, 2025-07-11 11:24:46.877849: serving on Window1 by staff, 2025-07-11 11:34:56.292601: serving on Window1 by staff', 0, 'Pregnant', 1, 1, '', 1),
-(90, '2025-07-10 14:42:46.509561', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:42:46.509561: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(91, '2025-07-10 14:47:52.304526', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:47:52.304526: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(92, '2025-07-10 14:59:48.590701', '004', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 14:59:48.590701: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(93, '2025-07-10 15:00:02.780760', '005', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:00:02.780760: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(94, '2025-07-10 15:00:12.174684', '006', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:00:12.174684: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(95, '2025-07-10 15:00:23.484018', '007', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:00:23.484018: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(96, '2025-07-10 15:15:45.688115', '008', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:15:45.688115: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(97, '2025-07-10 15:16:19.448900', '009', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:16:19.448900: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(98, '2025-07-10 15:26:01.753688', '010', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:26:01.753688: ticketGenerated', 0, 'Regular', 1, 0, '', 0),
-(99, '2025-07-10 15:26:26.039850', '011', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-10 15:26:26.039850: ticketGenerated', 0, 'Regular', 1, 0, '', 0);
+INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`, `gender`) VALUES
+(108, '2025-07-15 00:42:02.884', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 2, '2025-07-15 00:42:16.948', '', 'Serving', '2025-07-15 00:42:02.884: ticketGenerated, 2025-07-15 00:42:16.948: serving on Windows1 by staff', 0, 'Regular', 1, 1, '', 1, NULL),
+(109, '2025-07-15 00:42:03.844', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:03.844: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(110, '2025-07-15 00:42:04.727', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:04.727: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -237,16 +251,20 @@ CREATE TABLE `user` (
   `serviceType` text DEFAULT NULL,
   `username` text NOT NULL,
   `loggedIn` text DEFAULT NULL,
-  `servicesSet` text DEFAULT NULL
+  `servicesSet` text DEFAULT NULL,
+  `assignedStation` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`) VALUES
-(2, 'admin', 'Admin', '', 'admin', NULL, ''),
-(14, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-11 12:20:15.358571', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]');
+INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`, `assignedStation`) VALUES
+(2, 'admin', 'Admin', '', 'admin', NULL, '', ''),
+(14, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-15 00:46:48.125', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', ''),
+(16, 'staff1', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff1', NULL, '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', ''),
+(17, 'staff2', 'Staff', '[SUBMISSION OF SALN]', 'staff2', NULL, '[SUBMISSION OF SALN]', ''),
+(18, 'staff3', 'Staff', '[SUBMISSION OF SALN]', 'staff3', NULL, '[SUBMISSION OF SALN]', '');
 
 --
 -- Indexes for dumped tables
@@ -314,19 +332,19 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `controls`
 --
 ALTER TABLE `controls`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `media`
 --
 ALTER TABLE `media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `mediabg`
 --
 ALTER TABLE `mediabg`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `priorities`
@@ -338,31 +356,31 @@ ALTER TABLE `priorities`
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `servicegroup`
 --
 ALTER TABLE `servicegroup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `station`
 --
 ALTER TABLE `station`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
