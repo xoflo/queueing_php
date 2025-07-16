@@ -43,7 +43,7 @@ function handlePost($pdo, $input) {
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE servicegroup SET name = :name, assignedGroup = :assignedGroup, timeCreated = :timeCreated WHERE id = :id";
+    $sql = "UPDATE servicegroup SET name = :name, assignedGroup = :assignedGroup, timeCreated = :timeCreated, WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'timeCreated' => $input['timeCreated'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Service Group updated successfully']);
