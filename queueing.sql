@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 16, 2025 at 04:54 AM
+-- Generation Time: Jul 16, 2025 at 09:23 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -168,6 +168,13 @@ CREATE TABLE `servicegroup` (
   `timeCreated` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `servicegroup`
+--
+
+INSERT INTO `servicegroup` (`id`, `name`, `assignedGroup`, `timeCreated`) VALUES
+(8, 'New', '_MAIN_', '2025-07-16 14:22:56.816');
+
 -- --------------------------------------------------------
 
 --
@@ -234,7 +241,7 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`, `gender`) VALUES
-(108, '2025-07-15 00:42:02.884', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 2, '2025-07-15 00:42:16.948', '', 'Serving', '2025-07-15 00:42:02.884: ticketGenerated, 2025-07-15 00:42:16.948: serving on Windows1 by staff', 0, 'Regular', 1, 1, '', 1, NULL),
+(108, '2025-07-15 00:42:02.884', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-15 00:42:16.948', '', 'Serving', '2025-07-15 00:42:02.884: ticketGenerated, 2025-07-15 00:42:16.948: serving on Windows1 by staff', 0, 'Regular', 1, 1, '', 1, NULL),
 (109, '2025-07-15 00:42:03.844', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:03.844: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
 (110, '2025-07-15 00:42:04.727', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:04.727: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL);
 
@@ -362,7 +369,7 @@ ALTER TABLE `service`
 -- AUTO_INCREMENT for table `servicegroup`
 --
 ALTER TABLE `servicegroup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `station`
