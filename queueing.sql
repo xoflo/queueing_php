@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 16, 2025 at 09:23 AM
+-- Generation Time: Jul 17, 2025 at 02:45 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -39,17 +39,17 @@ CREATE TABLE `controls` (
 --
 
 INSERT INTO `controls` (`id`, `controlName`, `value`, `other`) VALUES
-(1, 'Priority Option', 1, NULL),
+(1, 'Priority Option', 0, NULL),
 (2, 'Ticket Name Option', 0, NULL),
-(3, 'Video View (TV)', 1, NULL),
-(4, 'Sliding Text', 1, '                    Office of the Ombudsman for Mindanao                    happy bday'),
-(5, 'Kiosk Password', 0, 'kiosk'),
-(6, 'RGB Screen (TV)', 1, '5:30:0.7:0'),
-(7, 'RGB Screen (Kiosk)', 1, '10:0:0:0'),
+(3, 'Gender Option', 1, NULL),
+(4, 'Video View (TV)', 0, NULL),
+(5, 'Sliding Text', 1, '                    Office of the Ombudsman for Mindanao                    happy bday'),
+(6, 'Kiosk Password', 0, 'kiosk'),
+(7, 'RGB Screen (TV)', 1, '5:30:0.7:0'),
+(8, 'RGB Screen (Kiosk)', 1, '10:0:0:0'),
 (9, 'BG Video (TV)', 0, NULL),
-(12, 'BG Video (Kiosk)', 1, NULL),
-(13, 'Staff Inactive Beep', 1, '60'),
-(14, 'Gender Option', 0, NULL);
+(10, 'BG Video (Kiosk)', 1, NULL),
+(11, 'Staff Inactive Beep', 1, '60');
 
 -- --------------------------------------------------------
 
@@ -199,8 +199,8 @@ CREATE TABLE `station` (
 INSERT INTO `station` (`id`, `stationNumber`, `inSession`, `userInSession`, `ticketServing`, `stationName`, `sessionPing`, `displayIndex`) VALUES
 (18, 1, 0, '', '', 'Window', '', 1),
 (19, 2, 0, '', '', 'Window', '', 2),
-(20, 3, 0, '', '', 'Window', '', 3),
-(21, 4, 0, '', '', 'Window', '', 4),
+(20, 3, 1, 'staff', '', 'Window', '2025-07-17 00:13:55.459', 3),
+(21, 4, 1, 'staff', '', 'Window', '2025-07-17 00:10:01.424', 4),
 (22, 5, 0, '', '', 'Window', '', 5),
 (23, 6, 0, '', '', 'Window', '', 6),
 (24, 7, 0, '', '', 'Window', '', 7),
@@ -241,9 +241,23 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`id`, `timeCreated`, `number`, `serviceCode`, `serviceType`, `userAssigned`, `stationName`, `stationNumber`, `timeTaken`, `timeDone`, `status`, `log`, `priority`, `priorityType`, `printStatus`, `callCheck`, `ticketName`, `blinker`, `gender`) VALUES
-(108, '2025-07-15 00:42:02.884', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 1, '2025-07-15 00:42:16.948', '', 'Serving', '2025-07-15 00:42:02.884: ticketGenerated, 2025-07-15 00:42:16.948: serving on Windows1 by staff', 0, 'Regular', 1, 1, '', 1, NULL),
-(109, '2025-07-15 00:42:03.844', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:03.844: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
-(110, '2025-07-15 00:42:04.727', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-15 00:42:04.727: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL);
+(111, '2025-07-16 17:59:30.861', '001', 'FS', 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS', 'staff', 'Window', 3, '2025-07-16 18:12:30.091', '2025-07-16 19:07:19.377', 'Done', '2025-07-16 17:59:30.861: ticketGenerated, 2025-07-16 18:12:30.091: serving on Window3 by staff, 2025-07-16 19:07:19.377: Ticket Session Finished', 0, 'Regular', 1, 1, '', 1, NULL),
+(112, '2025-07-16 17:59:32.641', '001', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 3, '2025-07-16 19:14:36.304', '2025-07-16 19:45:13.946', 'Done', '2025-07-16 17:59:32.641: ticketGenerated, 2025-07-16 19:14:36.304: serving on Window3 by staff, 2025-07-16 19:45:13.946: Ticket Session Finished', 0, 'Regular', 1, 1, '', 1, NULL),
+(113, '2025-07-16 17:59:35.633', '001', 'CG', 'REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE', 'staff', 'Window', 3, '2025-07-16 19:45:51.708', '2025-07-16 19:53:33.315', 'Done', '2025-07-16 17:59:35.633: ticketGenerated, 2025-07-16 19:45:51.708: serving on Window3 by staff, 2025-07-16 19:53:33.315: Ticket Session Finished', 0, 'Regular', 1, 0, '', 0, NULL),
+(114, '2025-07-16 17:59:36.958', '001', 'CI', 'REQUEST FOR CASE INFORMATION', '', '', 0, '', '', 'Pending', '2025-07-16 17:59:36.958: ticketGenerated', 1, 'Senior Citizen', 1, 0, '', 0, NULL),
+(115, '2025-07-16 17:59:38.192', '001', 'NC', 'FILING OF NEW COMPLAINTS', '', '', 0, '', '', 'Pending', '2025-07-16 17:59:38.192: ticketGenerated', 1, 'Pregnant', 1, 0, '', 0, NULL),
+(116, '2025-07-16 17:59:39.121', '001', 'CS', 'REQUEST FOR COPY OF SALN', '', '', 0, '', '', 'Pending', '2025-07-16 17:59:39.121: ticketGenerated', 1, 'PWD', 1, 0, '', 0, NULL),
+(117, '2025-07-16 19:50:32.706', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-16 19:50:32.706: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(118, '2025-07-16 19:52:22.698', '003', 'S', 'SUBMISSION OF SALN', 'staff', 'Window', 3, '2025-07-16 19:53:42.770', '2025-07-16 19:58:03.069', 'Done', '2025-07-16 19:52:22.698: ticketGenerated, 2025-07-16 19:53:42.770: serving on Window3 by staff, 2025-07-16 19:58:03.069: Ticket Session Finished', 1, 'PWD', 1, 0, '', 0, NULL),
+(119, '2025-07-16 19:52:23.935', '002', 'FS', 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS', '', '', 0, '', '', 'Pending', '2025-07-16 19:52:23.935: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(121, '2025-07-16 19:52:27.068', '003', 'FS', 'FILING / SUBMISSION OF CASE-RELATED DOCUMENTS', '', '', 0, '', '', 'Pending', '2025-07-16 19:52:27.068: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(122, '2025-07-17 00:40:34.070', '001', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 00:40:34.070: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(123, '2025-07-17 00:40:41.405', '002', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 00:40:41.405: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(124, '2025-07-17 00:47:21.248', '003', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 00:47:21.248: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(125, '2025-07-17 00:48:03.186', '004', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 00:48:03.186: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(126, '2025-07-17 00:50:44.419', '005', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 00:50:44.419: ticketGenerated', 0, 'Regular', 1, 0, '', 0, NULL),
+(127, '2025-07-17 01:16:21.823', '006', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 01:16:21.823: ticketGenerated', 1, 'Regular', 1, 0, 'Test', 0, 'Male'),
+(128, '2025-07-17 01:17:11.456', '007', 'S', 'SUBMISSION OF SALN', '', '', 0, '', '', 'Pending', '2025-07-17 01:17:11.456: ticketGenerated', 0, 'Regular', 1, 0, '', 0, 'Male');
 
 -- --------------------------------------------------------
 
@@ -267,11 +281,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `pass`, `userType`, `serviceType`, `username`, `loggedIn`, `servicesSet`, `assignedStation`) VALUES
-(2, 'admin', 'Admin', '', 'admin', NULL, '', ''),
-(14, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff', '2025-07-15 00:46:48.125', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', ''),
-(16, 'staff1', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'staff1', NULL, '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', ''),
-(17, 'staff2', 'Staff', '[SUBMISSION OF SALN]', 'staff2', NULL, '[SUBMISSION OF SALN]', ''),
-(18, 'staff3', 'Staff', '[SUBMISSION OF SALN]', 'staff3', NULL, '[SUBMISSION OF SALN]', '');
+(2, 'admin', 'Admin', NULL, 'admin', NULL, '[ul]', 'All_999'),
+(20, 'staff', 'Staff', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE, REQUEST FOR CASE INFORMATION, FILING OF NEW COMPLAINTS, REQUEST FOR COPY OF SALN, APPLICATION FOR OMB CLEARANCE, PAYMENTS, RELEASING OF CHECKS, RELEASING OF CLEARANCE, REQUEST FOR ASSISTANCE]', 'staff', '2025-07-17 00:07:05.837', '[FILING / SUBMISSION OF CASE-RELATED DOCUMENTS, SUBMISSION OF SALN, REDRESS OF CLIENTS\' COMPLAINTS & GRIEVANCE]', 'Window 3_20');
 
 --
 -- Indexes for dumped tables
@@ -339,7 +350,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `controls`
 --
 ALTER TABLE `controls`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `media`
@@ -381,13 +392,13 @@ ALTER TABLE `station`
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
