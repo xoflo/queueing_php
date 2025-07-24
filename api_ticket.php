@@ -28,9 +28,29 @@ switch ($method) {
 }
 
 function handleGet($pdo) {
+    $filterToday = isset($_GET['today']) ? ($_GET['today'] === 'true') : false;
+
+    // Base query
     $sql = "SELECT * FROM ticket";
+
+    // Conditions array
+    $conditions = [];
+    $params = [];
+
+    if ($filterToday) {
+        $conditions[] = "DATE(timeCreated) = CURDATE()";
+    }
+
+    // Always filter status for Pending or Serving
+    $conditions[] = "(status = 'Pending' OR status = 'Serving')";
+
+    // Combine conditions with AND if any exist
+    if (count($conditions) > 0) {
+        $sql .= " WHERE " . implode(" AND ", $conditions);
+    }
+
     $stmt = $pdo->prepare($sql);
-    $stmt->execute();
+    $stmt->execute($params);
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($result);
 }
