@@ -1,9 +1,10 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
+
 include 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -30,27 +31,15 @@ switch ($method) {
 function handleGet($pdo) {
     $filterToday = isset($_GET['today']) ? ($_GET['today'] === 'true') : false;
 
-    // Base query
-    $sql = "SELECT * FROM ticket";
-
-    // Conditions array
-    $conditions = [];
-    $params = [];
-
     if ($filterToday) {
-        $conditions[] = "DATE(timeCreated) = CURDATE()";
+        $sql = "SELECT * FROM ticket WHERE DATE(timeCreated) = CURDATE() AND (status = 'Pending' OR status = 'Serving')";
+        $stmt = $pdo->prepare($sql);
+    } else {
+        $sql = "SELECT * FROM ticket";
+        $stmt = $pdo->prepare($sql);
     }
 
-    // Always filter status for Pending or Serving
-    $conditions[] = "(status = 'Pending' OR status = 'Serving')";
-
-    // Combine conditions with AND if any exist
-    if (count($conditions) > 0) {
-        $sql .= " WHERE " . implode(" AND ", $conditions);
-    }
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($result);
 }
@@ -58,14 +47,53 @@ function handleGet($pdo) {
 function handlePost($pdo, $input) {
     $sql = "INSERT INTO ticket (timeCreated, number, serviceCode, serviceType, userAssigned, stationName, stationNumber, timeTaken, timeDone, status, log, priority, priorityType, printStatus, callCheck, ticketName, blinker, gender) VALUES (:timeCreated, :number, :serviceCode, :serviceType, :userAssigned, :stationName, :stationNumber, :timeTaken, :timeDone, :status, :log, :priority, :priorityType, :printStatus, :callCheck, :ticketName, :blinker, :gender)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceCode' => $input['serviceCode'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationName' => $input['stationName'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus'], 'callCheck' => $input['callCheck'], 'ticketName' => $input['ticketName'], 'blinker' => $input['blinker'], 'gender' => $input['gender']]);
+    $stmt->execute([
+        'timeCreated' => $input['timeCreated'],
+        'number' => $input['number'],
+        'serviceCode' => $input['serviceCode'],
+        'serviceType' => $input['serviceType'],
+        'userAssigned' => $input['userAssigned'],
+        'stationName' => $input['stationName'],
+        'stationNumber' => $input['stationNumber'],
+        'timeTaken' => $input['timeTaken'],
+        'timeDone' => $input['timeDone'],
+        'status' => $input['status'],
+        'log' => $input['log'],
+        'priority' => $input['priority'],
+        'priorityType' => $input['priorityType'],
+        'printStatus' => $input['printStatus'],
+        'callCheck' => $input['callCheck'],
+        'ticketName' => $input['ticketName'],
+        'blinker' => $input['blinker'],
+        'gender' => $input['gender']
+    ]);
     echo json_encode(['message' => 'Ticket created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceCode = :serviceCode, serviceType = :serviceType, userAssigned = :userAssigned, stationName = :stationName, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus, callCheck = :callCheck, ticketName = :ticketName, blinker = :blinker, gender = :gender  WHERE id = :id";
+    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceCode = :serviceCode, serviceType = :serviceType, userAssigned = :userAssigned, stationName = :stationName, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus, callCheck = :callCheck, ticketName = :ticketName, blinker = :blinker, gender = :gender WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['timeCreated' => $input['timeCreated'], 'number' => $input['number'], 'serviceCode' => $input['serviceCode'], 'serviceType' => $input['serviceType'], 'userAssigned' => $input['userAssigned'], 'stationName' => $input['stationName'], 'stationNumber' => $input['stationNumber'], 'timeTaken' => $input['timeTaken'], 'timeDone' => $input['timeDone'], 'status' => $input['status'], 'log' => $input['log'], 'priority' => $input['priority'], 'priorityType' => $input['priorityType'], 'printStatus' => $input['printStatus'], 'callCheck' => $input['callCheck'], 'ticketName' => $input['ticketName'], 'blinker' => $input['blinker'],'gender' => $input['gender'], 'id' => $input['id']]);
+    $stmt->execute([
+        'timeCreated' => $input['timeCreated'],
+        'number' => $input['number'],
+        'serviceCode' => $input['serviceCode'],
+        'serviceType' => $input['serviceType'],
+        'userAssigned' => $input['userAssigned'],
+        'stationName' => $input['stationName'],
+        'stationNumber' => $input['stationNumber'],
+        'timeTaken' => $input['timeTaken'],
+        'timeDone' => $input['timeDone'],
+        'status' => $input['status'],
+        'log' => $input['log'],
+        'priority' => $input['priority'],
+        'priorityType' => $input['priorityType'],
+        'printStatus' => $input['printStatus'],
+        'callCheck' => $input['callCheck'],
+        'ticketName' => $input['ticketName'],
+        'blinker' => $input['blinker'],
+        'gender' => $input['gender'],
+        'id' => $input['id']
+    ]);
     echo json_encode(['message' => 'Ticket updated successfully']);
 }
 
