@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 
-let mysql = require('mysql');
+let mysql = require('mysql2');
 
 let con = mysql.createConnection({
   host: "localhost",
@@ -21,27 +21,28 @@ console.log('WebSocket server is running on ws://localhost:3000');
 // Connection event handler
 wss.on('connection', (ws) => {
   console.log('New client connected');
-
-  ws.send('Welcome to the WebSocket server!');
-
   ws.on('message', (message) => {
 
-  if (message === 'getTicket') {
+  const parsed = JSON.parse(message);
+  const type = parsed['type'];
+
+  if (type === 'getTicket') {
   con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
     con.query("SELECT * FROM customers", function (err, result) {
       if (err) throw err;
       console.log("Result: " + result);
-      ws.send(`Server received: ${result}`);
+      ws.send(JSON.stringify({
+        "type": "getTicket",
+        "data": result
+      }));
     });
   });
 
   }
 
     console.log(`Received: ${message}`);
-    // Echo the message back to the client
-    ws.send(`Server received: ${message}`);
   });
 
   // Close event handler
