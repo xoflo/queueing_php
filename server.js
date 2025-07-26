@@ -21,109 +21,155 @@ console.log('🧼 WebSocket server running at ws://localhost:3000');
 // ✅ Handler Function
 function handleMessage(type, data, ws) {
   switch (type) {
-    case 'getStation':{
+    case 'getStation': {
       con.query("SELECT * FROM station", (err, result) => {
         if (err) {
           console.error(err);
           return;
         }
 
-        ws.send(JSON.stringify({
-          type: "getStation",
-          data: result
-        }));
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              type: "getStation",
+              data: result
+            }));
+          }
+        });
 
-        console.log("📥 getTicket -> result:", result);
+        console.log("📥 getStation -> result:", result);
       });
-      break;}
+      break;
+    }
 
-    case 'getTicket':{
+    case 'getTicket': {
       con.query("SELECT * FROM ticket WHERE status IN ('Pending', 'Serving')", (err, result) => {
         if (err) {
           console.error(err);
           return;
         }
 
-        ws.send(JSON.stringify({
-          type: "getTicket",
-          data: result
-        }));
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              type: "getTicket",
+              data: result
+            }));
+          }
+        });
 
         console.log("📥 getTicket -> result:", result);
       });
-      break;}
+      break;
+    }
 
-    case 'updateTicket':{
+    case 'updateTicket': {
       const {
-          id,
-          status = null,
-          timeDone = null,
-          log = null,
-          userAssigned = null,
-          stationName = null,
-          stationNumber = null,
-          timeTaken = null,
-          serviceType = null
-
-        } = data;
+        id = null,
+        status = null,
+        timeDone = null,
+        log = null,
+        userAssigned = null,
+        stationName = null,
+        stationNumber = null,
+        timeTaken = null,
+        serviceType = null,
+        blinker = 0,
+        callCheck = 0
+      } = data;
 
       con.query(
-      `UPDATE ticket SET
-       status = ?,
-       timeDone = ?,
-       log = ?,
-       userAssigned = ?,
-       stationName = ?,
-       stationNumber = ?,
-       timeTaken = ?,
-       serviceType = ?,
-       blinker = ?,
-       callCheck = ?
-       WHERE id = ?`,
-       [status, timeDone, log, userAssigned, stationName, stationNumber, timeTaken, serviceType, id],
+        `UPDATE ticket SET
+         status = ?,
+         timeDone = ?,
+         log = ?,
+         userAssigned = ?,
+         stationName = ?,
+         stationNumber = ?,
+         timeTaken = ?,
+         serviceType = ?,
+         blinker = ?,
+         callCheck = ?
+         WHERE id = ?`,
+        [status, timeDone, log, userAssigned, stationName, stationNumber, timeTaken, serviceType, blinker, callCheck, id],
         (err, result) => {
           if (err) {
             console.error(err);
             return;
           }
 
-          ws.send(JSON.stringify({
-            type: "updateTicket",
-            data: result
-          }));
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: "updateTicket",
+                data: result
+              }));
+            }
+          });
 
           console.log("✅ updateTicket -> result:", result);
         }
       );
-      break;}
+      break;
+    }
 
-      case 'updateStation':{
-      const { codeAndNumber, id } = data;
+    case 'updateStation': {
+      const {
+        ticketServing,
+        id
+      } = data;
 
-            con.query("UPDATE station SET ticketServing = ? WHERE id = ?", [codeAndNumber, id], (err, result) => {
-              if (err) {
-                console.error(err);
-                return;
-              }
+      console.log("🔄 updateStation called with:", { id, ticketServing });
 
-              ws.send(JSON.stringify({
-                type: "updateStation",
-                data: result
+      con.query("UPDATE stations SET ticketServing = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM stations WHERE ticketServing = ?)", [ticketServing, id], (err, result) => {
+        if (err) {
+          console.error("❌ updateStation error:", err);
+          return;
+        }
+
+        console.log("✅ updateStation -> result:", result);
+
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              type: "updateStation",
+              data: result  // <- include result!
+            }));
+          }
+        });
+      });
+      break;
+    }
+
+    case 'createTicket': {
+
+
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: "createTicket"
+          }));
+        }
+      });
+
+      console.log("📥 createTicket broadcasted");
+      break;
+    }
+
+    case 'refresh': {
+
+
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: "refresh"
               }));
+            }
+          });
 
-              console.log("📥 getTicket -> result:", result);
-            });
-            break;}
-
-      case 'createTicket':{
-                    ws.send(JSON.stringify({
-                      type: "createTicket",
-                      data: {}
-                    }));
-
-                    console.log("📥 getTicket -> result:", result);
-
-                  break;}
+          console.log("📥 createTicket broadcasted");
+          break;
+        }
 
     default:
       console.warn("❓ Unknown type received:", type);

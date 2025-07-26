@@ -50,11 +50,41 @@ function handlePost($pdo, $input) {
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE station SET sessionPing = :sessionPing,stationNumber = :stationNumber, inSession = :inSession, userInSession = :userInSession, ticketServing = :ticketServing, stationName = :stationName, displayIndex = :displayIndex WHERE id = :id";
+    if (!isset($input['id'])) {
+        echo json_encode(['error' => 'ID is required']);
+        http_response_code(400);
+        return;
+    }
+
+    $id = $input['id'];
+    $allowedFields = ['sessionPing', 'stationNumber', 'inSession', 'userInSession', 'ticketServing', 'stationName', 'displayIndex'];
+
+    $setParts = [];
+    $params = [];
+
+    foreach ($allowedFields as $field) {
+        if (isset($input[$field])) {
+            $setParts[] = "$field = :$field";
+            $params[$field] = $input[$field];
+        }
+    }
+
+    if (empty($setParts)) {
+        echo json_encode(['error' => 'No fields to update']);
+        http_response_code(400);
+        return;
+    }
+
+    $params['id'] = $id;
+    $setClause = implode(', ', $setParts);
+    $sql = "UPDATE station SET $setClause WHERE id = :id";
+
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['sessionPing' => $input['sessionPing'], 'stationNumber' => $input['stationNumber'], 'inSession' => $input['inSession'], 'userInSession' => $input['userInSession'], 'ticketServing' => $input['ticketServing'], 'stationName' => $input['stationName'], 'displayIndex' => $input['displayIndex'], 'id' => $input['id']]);
+    $stmt->execute($params);
+
     echo json_encode(['message' => 'Station updated successfully']);
 }
+
 
 function handleDelete($pdo, $input) {
     $sql = "DELETE FROM station WHERE id = :id";
