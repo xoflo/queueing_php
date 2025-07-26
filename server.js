@@ -62,7 +62,9 @@ function handleMessage(type, data, ws) {
           userAssigned = null,
           stationName = null,
           stationNumber = null,
-          timeTaken = null
+          timeTaken = null,
+          serviceType = null
+
         } = data;
 
       con.query(
@@ -73,8 +75,10 @@ function handleMessage(type, data, ws) {
        userAssigned = ?,
        stationName = ?,
        stationNumber = ?,
-       timeTaken = ?
-       serviceType = ?
+       timeTaken = ?,
+       serviceType = ?,
+       blinker = ?,
+       callCheck = ?
        WHERE id = ?`,
        [status, timeDone, log, userAssigned, stationName, stationNumber, timeTaken, serviceType, id],
         (err, result) => {
