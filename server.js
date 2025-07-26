@@ -117,7 +117,7 @@ function handleMessage(type, data, ws) {
                     }));
 
                     console.log("📥 getTicket -> result:", result);
-                  });
+                  }
                   break;}
 
     default:
