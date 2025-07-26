@@ -74,8 +74,9 @@ function handleMessage(type, data, ws) {
        stationName = ?,
        stationNumber = ?,
        timeTaken = ?
+       serviceType = ?
        WHERE id = ?`,
-       [status, timeDone, log, userAssigned, stationName, stationNumber, timeTaken, id],
+       [status, timeDone, log, userAssigned, stationName, stationNumber, timeTaken, serviceType, id],
         (err, result) => {
           if (err) {
             console.error(err);
