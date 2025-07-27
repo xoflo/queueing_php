@@ -18,8 +18,13 @@ con.connect(function (err) {
 const wss = new WebSocket.Server({ port: 3000 });
 console.log('🧼 WebSocket server running at ws://localhost:3000');
 
+let lastBatch = null;
+let lastBatchTime = 0;
+let lastSender = null;
+const BATCH_WINDOW = 1000; // 1 second
+
 // ✅ Handler Function
-function handleMessage(type, data, ws) {
+function handleMessage(type, data, ws, batchMeta = null) {
   switch (type) {
     case 'getStation': {
       con.query("SELECT * FROM station", (err, result) => {
@@ -98,16 +103,23 @@ function handleMessage(type, data, ws) {
             return;
           }
 
-          wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: "updateTicket",
-                data: result
-              }));
+          con.query("SELECT * FROM ticket WHERE id = ?", [id], (err2, updatedTicket) => {
+            if (err2) {
+              console.error("❌ Failed to fetch updated ticket:", err2);
+              return;
             }
-          });
 
-          console.log("✅ updateTicket -> result:", result);
+            wss.clients.forEach(client => {
+              if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                  type: "updateTicket",
+                  data: updatedTicket[0] || null
+                }));
+              }
+            });
+
+            console.log("✅ updateTicket -> updated ticket:", updatedTicket[0]);
+          });
         }
       );
       break;
@@ -121,29 +133,34 @@ function handleMessage(type, data, ws) {
 
       console.log("🔄 updateStation called with:", { id, ticketServing });
 
-      con.query("UPDATE stations SET ticketServing = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM stations WHERE ticketServing = ?)", [ticketServing, id], (err, result) => {
+      con.query("UPDATE station SET ticketServing = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM station WHERE ticketServing = ?)", [ticketServing, id, ticketServing], (err, result) => {
         if (err) {
           console.error("❌ updateStation error:", err);
           return;
         }
 
-        console.log("✅ updateStation -> result:", result);
-
-        wss.clients.forEach(client => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({
-              type: "updateStation",
-              data: result  // <- include result!
-            }));
+        con.query("SELECT * FROM station WHERE id = ?", [id], (err2, updatedStation) => {
+          if (err2) {
+            console.error("❌ Failed to fetch updated station:", err2);
+            return;
           }
+
+          console.log("✅ updateStation -> result:", updatedStation[0]);
+
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: "updateStation",
+                data: updatedStation[0] || null
+              }));
+            }
+          });
         });
       });
       break;
     }
 
     case 'createTicket': {
-
-
       wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({
@@ -157,19 +174,17 @@ function handleMessage(type, data, ws) {
     }
 
     case 'refresh': {
-
-
-          wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: "refresh"
-              }));
-            }
-          });
-
-          console.log("📥 createTicket broadcasted");
-          break;
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: "refresh"
+          }));
         }
+      });
+
+      console.log("📥 refresh broadcasted");
+      break;
+    }
 
     default:
       console.warn("❓ Unknown type received:", type);
@@ -185,17 +200,26 @@ wss.on('connection', (ws) => {
     try {
       const payload = JSON.parse(message);
 
-      // ✅ Handle batch messages
       if (Array.isArray(payload.batch)) {
-        payload.batch.forEach(({ type, data }) => {
-          handleMessage(type, data, ws);
-        });
-      }
-      // ✅ Handle single messages
-      else if (payload.type && payload.data !== undefined) {
+        const now = Date.now();
+
+        if (!lastBatch || (now - lastBatchTime > BATCH_WINDOW)) {
+          lastBatch = payload.batch;
+          lastBatchTime = now;
+          lastSender = ws;
+
+          payload.batch.forEach(({ type, data }) => {
+            handleMessage(type, data, ws, { isWinner: true });
+          });
+
+          ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
+        } else {
+          ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
+          console.log("❌ Batch denied due to timing race");
+        }
+      } else if (payload.type && payload.data !== undefined) {
         handleMessage(payload.type, payload.data, ws);
       }
-
     } catch (err) {
       console.error('❌ Invalid JSON:', err);
     }
