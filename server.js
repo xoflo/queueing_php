@@ -66,8 +66,8 @@ async function handleMessage(type, data, ws) {
             timeTaken, serviceType, blinker, callCheck, id]
         );
 
-        const [rows] = await pool.query("SELECT * FROM ticket WHERE id = ?", [id]);
-        broadcast({ type: "updateTicket", data: rows[0] || null });
+        const [rows] = await pool.query("SELECT * FROM ticket", [id]);
+        broadcast({ type: "updateTicket", data: rows || null });
         break;
       }
 
@@ -85,8 +85,8 @@ async function handleMessage(type, data, ws) {
           [ticketServing, ticketServingId, id, ticketServing]
         );
 
-        const [rows] = await pool.query("SELECT * FROM station WHERE id = ?", [id]);
-        broadcast({ type: "updateStation", data: rows[0] || null });
+        const [rows] = await pool.query("SELECT * FROM station", [id]);
+        broadcast({ type: "updateStation", data: rows || null });
         break;
       }
 
