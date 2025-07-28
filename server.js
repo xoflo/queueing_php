@@ -18,6 +18,8 @@ console.log('🧼 WebSocket server running at ws://localhost:3000');
 // Batch blocking setup
 let lastBatchTime = 0;
 const BATCH_WINDOW = 2000;
+let lastSender = null;
+let lastTicketId = null;
 
 function broadcast(payload) {
   wss.clients.forEach(client => {
@@ -25,6 +27,11 @@ function broadcast(payload) {
       client.send(JSON.stringify(payload));
     }
   });
+}
+
+function extractUpdateTicketId(batch) {
+  const ticketUpdate = batch.find(item => item.type === 'updateTicket');
+  return ticketUpdate ? ticketUpdate.data.id : null;
 }
 
 // ✅ Core Handler Function
@@ -96,7 +103,7 @@ async function handleMessage(type, data, ws) {
   }
 }
 
-// ✅ WebSocket Setup
+// WebSocket Setup
 wss.on('connection', (ws) => {
   console.log('🔌 Client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
@@ -104,35 +111,45 @@ wss.on('connection', (ws) => {
   ws.on('message', async (message) => {
     try {
       const payload = JSON.parse(message);
+      const sender = ws._socket.remoteAddress; // or use a custom identifier
 
-      // ✅ Handle Batch Mode
+      // Handle Batch Mode
       if (Array.isArray(payload.batch)) {
         const now = Date.now();
+        const currentTicketId = extractUpdateTicketId(payload.batch);
 
-        if (now - lastBatchTime > BATCH_WINDOW) {
-          lastBatchTime = now;
+        const isTooSoon = now - lastBatchTime < BATCH_WINDOW;
+        const isSameSender = sender === lastSender;
+        const isSameTicket = currentTicketId && currentTicketId === lastTicketId;
 
-          for (const { type, data } of payload.batch) {
-            await handleMessage(type, data, ws);
-          }
-
-          ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
-        } else {
+        if (isTooSoon && (isSameSender || isSameTicket)) {
           ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
-          console.log("❌ Batch denied: another device already executed.");
+          console.log("Action denied. Ticket already taken.");
+          return;
         }
 
-      // ✅ Handle Single Payload
+        // Accept the batch
+        lastBatchTime = now;
+        lastSender = sender;
+        lastTicketId = currentTicketId;
+
+        for (const { type, data } of payload.batch) {
+          await handleMessage(type, data, ws);
+        }
+
+        ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
+
+      // Handle Single Payload
       } else if (payload.type && payload.data !== undefined) {
         await handleMessage(payload.type, payload.data, ws);
       }
 
     } catch (err) {
-      console.error("❌ Invalid message:", err);
+      console.error("Invalid message:", err);
     }
   });
 
   ws.on('close', () => {
-    console.log('❌ Client disconnected');
+    console.log('Client disconnected');
   });
 });
