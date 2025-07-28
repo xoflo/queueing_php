@@ -1,45 +1,47 @@
+// ✅ Import required packages
 const WebSocket = require('ws');
-const mysql = require('mysql2/promise'); // Promise-based MySQL
+const mysql = require('mysql2/promise'); // switched to promise version
 
-// ✅ MySQL Pool Setup
-const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: 'queueing',
-  waitForConnections: true,
-  connectionLimit: 100,
-  queueLimit: 0
-});
+// ✅ MySQL connection
+let con;
+(async () => {
+  try {
+    con = await mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "",
+      database: 'queueing'
+    });
+    console.log("✅ Connected to MySQL!");
+  } catch (err) {
+    console.error("❌ MySQL connection failed:", err);
+  }
+})();
 
+// ✅ WebSocket Server
 const wss = new WebSocket.Server({ port: 3000 });
 console.log('🧼 WebSocket server running at ws://localhost:3000');
 
-// Batch blocking setup
+let lastBatch = null;
 let lastBatchTime = 0;
-const BATCH_WINDOW = 2000;
+let lastSender = null;
+const BATCH_WINDOW = 1000; // 1 second
 
-function broadcast(payload) {
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(payload));
-    }
-  });
-}
-
-// ✅ Core Handler Function
-async function handleMessage(type, data, ws) {
+// ✅ Async Handler Function
+async function handleMessage(type, data, ws, batchMeta = null) {
   try {
     switch (type) {
       case 'getStation': {
-        const [rows] = await pool.query("SELECT * FROM station");
+        const [rows] = await con.query("SELECT * FROM station");
         broadcast({ type: "getStation", data: rows });
+        console.log("📥 getStation -> result:", rows);
         break;
       }
 
       case 'getTicket': {
-        const [rows] = await pool.query("SELECT * FROM ticket WHERE status IN ('Pending', 'Serving')");
+        const [rows] = await con.query("SELECT * FROM ticket WHERE status IN ('Pending', 'Serving')");
         broadcast({ type: "getTicket", data: rows });
+        console.log("📥 getTicket -> result:", rows);
         break;
       }
 
@@ -49,89 +51,96 @@ async function handleMessage(type, data, ws) {
           timeTaken, serviceType, blinker = 0, callCheck = 0
         } = data;
 
-        await pool.query(
+        await con.query(
           `UPDATE ticket SET
-            status = ?, timeDone = ?, log = ?, userAssigned = ?,
-            stationName = ?, stationNumber = ?, timeTaken = ?,
-            serviceType = ?, blinker = ?, callCheck = ?
-          WHERE id = ?`,
+           status = ?, timeDone = ?, log = ?, userAssigned = ?,
+           stationName = ?, stationNumber = ?, timeTaken = ?,
+           serviceType = ?, blinker = ?, callCheck = ?
+           WHERE id = ?`,
           [status, timeDone, log, userAssigned, stationName, stationNumber,
             timeTaken, serviceType, blinker, callCheck, id]
         );
 
-        const [rows] = await pool.query("SELECT * FROM ticket");
-        broadcast({ type: "updateTicket", data: rows || null });
+        const [updatedRows] = await con.query("SELECT * FROM ticket WHERE id = ?", [id]);
+        broadcast({ type: "updateTicket", data: updatedRows[0] || null });
+        console.log("✅ updateTicket -> updated ticket:", updatedRows[0]);
         break;
       }
 
       case 'updateStation': {
-        const { ticketServing, ticketServingId, id } = data;
+        const { ticketServing, id } = data;
+        console.log("🔄 updateStation called with:", { id, ticketServing });
 
-        await pool.query(
-          `UPDATE station SET
-            ticketServing = ?,
-            ticketServingId = ?
-           WHERE id = ?
-             AND NOT EXISTS (
-               SELECT 1 FROM station WHERE ticketServing = ?
-             )`,
-          [ticketServing, ticketServingId, id, ticketServing]
+        await con.query(
+          "UPDATE station SET ticketServing = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM station WHERE ticketServing = ?)",
+          [ticketServing, id, ticketServing]
         );
 
-        const [rows] = await pool.query("SELECT * FROM station");
-        broadcast({ type: "updateStation", data: rows || null });
+        const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
+        broadcast({ type: "updateStation", data: updatedRows[0] || null });
+        console.log("✅ updateStation -> result:", updatedRows[0]);
         break;
       }
 
-      case 'createTicket':
+      case 'createTicket': {
         broadcast({ type: "createTicket" });
+        console.log("📥 createTicket broadcasted");
         break;
+      }
 
-      case 'refresh':
+      case 'refresh': {
         broadcast({ type: "refresh" });
+        console.log("📥 refresh broadcasted");
         break;
+      }
 
       default:
         console.warn("❓ Unknown type received:", type);
     }
   } catch (err) {
-    console.error(`❌ Error in ${type}:`, err);
+    console.error(`❌ Error handling ${type}:`, err);
   }
 }
 
-// ✅ WebSocket Setup
+function broadcast(payload) {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(payload));
+    }
+  });
+}
+
+// ✅ WebSocket Connection
 wss.on('connection', (ws) => {
-  console.log('🔌 Client connected');
+  console.log('🔌 New client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
 
   ws.on('message', async (message) => {
     try {
       const payload = JSON.parse(message);
 
-      // ✅ Handle Batch Mode
       if (Array.isArray(payload.batch)) {
         const now = Date.now();
 
-        if (now - lastBatchTime > BATCH_WINDOW) {
+        if (!lastBatch || (now - lastBatchTime > BATCH_WINDOW)) {
+          lastBatch = payload.batch;
           lastBatchTime = now;
+          lastSender = ws;
 
           for (const { type, data } of payload.batch) {
-            await handleMessage(type, data, ws);
+            await handleMessage(type, data, ws, { isWinner: true });
           }
 
           ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
         } else {
           ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
-          console.log("❌ Batch denied: another device already executed.");
+          console.log("❌ Batch denied due to timing race");
         }
-
-      // ✅ Handle Single Payload
       } else if (payload.type && payload.data !== undefined) {
         await handleMessage(payload.type, payload.data, ws);
       }
-
     } catch (err) {
-      console.error("❌ Invalid message:", err);
+      console.error('❌ Invalid JSON:', err);
     }
   });
 
