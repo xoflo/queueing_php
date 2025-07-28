@@ -1,3 +1,0 @@
-Starting server.js... 
-🧼 WebSocket server running at ws://localhost:3000
-^C
