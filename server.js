@@ -68,12 +68,12 @@ async function handleMessage(type, data, ws, batchMeta = null) {
       }
 
       case 'updateStation': {
-        const { ticketServing, id } = data;
-        console.log("🔄 updateStation called with:", { id, ticketServing });
+        const { ticketServing, ticketServingId, id } = data;
+        console.log("🔄 updateStation called with:", { id, ticketServing, ticketServingId });
 
         await con.query(
-          "UPDATE station SET ticketServing = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM station WHERE ticketServing = ?)",
-          [ticketServing, id, ticketServing]
+          "UPDATE station SET ticketServing = ?, ticketServingId = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM station WHERE ticketServing = ?)",
+          [ticketServing, ticketServingId, id, ticketServing]
         );
 
         const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
@@ -92,6 +92,14 @@ async function handleMessage(type, data, ws, batchMeta = null) {
         broadcast({ type: "refresh" });
         console.log("📥 refresh broadcasted");
         break;
+      }
+
+      case 'updateDisplay': {
+       const [updatedStation] = await con.query("SELECT * FROM station");
+       const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving'");
+
+       broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
+      break;
       }
 
       default:
@@ -119,26 +127,45 @@ wss.on('connection', (ws) => {
     try {
       const payload = JSON.parse(message);
 
-      if (Array.isArray(payload.batch)) {
-        const now = Date.now();
+      ws.on('message', async (message) => {
+        try {
+          const payload = JSON.parse(message);
 
-        if (!lastBatch || (now - lastBatchTime > BATCH_WINDOW)) {
-          lastBatch = payload.batch;
-          lastBatchTime = now;
-          lastSender = ws;
+          if (Array.isArray(payload.batch)) {
+            const now = Date.now();
 
-          for (const { type, data } of payload.batch) {
-            await handleMessage(type, data, ws, { isWinner: true });
+            // Extract updateTicket ID (if any)
+            const updateTicketOp = payload.batch.find(item => item.type === 'updateTicket');
+            const ticketId = updateTicketOp?.data?.id;
+
+            const lastUpdateTicketOp = lastBatch?.find(item => item.type === 'updateTicket');
+            const lastTicketId = lastUpdateTicketOp?.data?.id;
+
+            const isSameTicket = ticketId !== undefined && lastTicketId === ticketId;
+
+            if (!lastBatch || !isSameTicket || (now - lastBatchTime > BATCH_WINDOW)) {
+              lastBatch = payload.batch;
+              lastBatchTime = now;
+              lastSender = ws;
+
+              for (const { type, data } of payload.batch) {
+                await handleMessage(type, data, ws, { isWinner: true });
+              }
+
+              ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
+            } else {
+              ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
+              console.log("❌ Batch denied due to duplicate ticket ID and timing race");
+            }
+
+          } else if (payload.type && payload.data !== undefined) {
+            await handleMessage(payload.type, payload.data, ws);
           }
-
-          ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
-        } else {
-          ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
-          console.log("❌ Batch denied due to timing race");
+        } catch (err) {
+          console.error('❌ Invalid JSON:', err);
         }
-      } else if (payload.type && payload.data !== undefined) {
-        await handleMessage(payload.type, payload.data, ws);
-      }
+      });
+
     } catch (err) {
       console.error('❌ Invalid JSON:', err);
     }
