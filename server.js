@@ -75,10 +75,13 @@ async function handleMessage(type, data, ws) {
         const { ticketServing, ticketServingId, id } = data;
 
         await pool.query(
-          `UPDATE station SET ticketServing = ?, ticketServingId
-           WHERE id = ? AND NOT EXISTS (
-             SELECT 1 FROM station WHERE ticketServing = ?
-           )`,
+          `UPDATE station SET
+            ticketServing = ?,
+            ticketServingId = ?
+           WHERE id = ?
+             AND NOT EXISTS (
+               SELECT 1 FROM station WHERE ticketServing = ?
+             )`,
           [ticketServing, ticketServingId, id, ticketServing]
         );
 
