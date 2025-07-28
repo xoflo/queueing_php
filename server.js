@@ -72,14 +72,14 @@ async function handleMessage(type, data, ws) {
       }
 
       case 'updateStation': {
-        const { ticketServing, id } = data;
+        const { ticketServing, ticketServingId, id } = data;
 
         await pool.query(
-          `UPDATE station SET ticketServing = ?
+          `UPDATE station SET ticketServing = ?, ticketServingId
            WHERE id = ? AND NOT EXISTS (
              SELECT 1 FROM station WHERE ticketServing = ?
            )`,
-          [ticketServing, id, ticketServing]
+          [ticketServing, ticketServingId, id, ticketServing]
         );
 
         const [rows] = await pool.query("SELECT * FROM station WHERE id = ?", [id]);
