@@ -82,6 +82,72 @@ async function handleMessage(type, data, ws, batchMeta = null) {
         break;
       }
 
+      case 'stationPing': {
+        try {
+          const { id, sessionPing, inSession, userInSession } = data;
+
+          if (!id) {
+            console.warn("⚠️ stationPing missing station ID");
+            break;
+          }
+
+          await con.query(
+            `UPDATE station SET
+              sessionPing = ?,
+              inSession = ?,
+              userInSession = ?
+             WHERE id = ?`,
+            [sessionPing, inSession, userInSession, id]
+          );
+
+          const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
+          broadcast({ type: "updateStation", data: updatedRows[0] || null });
+
+          console.log(`📶 Pinged: Station ${updatedRows[0].stationName}${updatedRows[0].stationNumber}`);
+        } catch (err) {
+          console.error("❌ stationPing error:", err);
+        }
+        break;
+      }
+
+
+      case 'checkStationSessions': {
+        try {
+          const [stations] = await con.query("SELECT * FROM station");
+
+          const now = new Date();
+
+          const activeStations = stations.filter(s => s.sessionPing && s.sessionPing !== "");
+
+          let stationChanges = 0;
+
+          for (const s of activeStations) {
+            const pingTime = new Date(s.sessionPing);
+            const diffSeconds = (now - pingTime) / 1000;
+
+            if (diffSeconds > 3) {
+              await con.query(
+                `UPDATE station
+                 SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = ''
+                 WHERE id = ?`,
+                [s.id]
+              );
+              console.log(`⛔ Session timeout: Station ${s.stationName}${s.stationNumber}`);
+            }
+          }
+
+          // Optional: broadcast updated station list if any were changed
+          const [updatedStations] = await con.query("SELECT * FROM station");
+          broadcast({ type: "updateStationBulk", data: updatedStations });
+
+          console.log(`🔁 checkStationSessions -> active: ${activeStations.length}`);
+        } catch (err) {
+          console.error("❌ checkStationSessions error:", err);
+        }
+        break;
+      }
+
+
       case 'createTicket': {
         broadcast({ type: "createTicket" });
         console.log("📥 createTicket broadcasted");
