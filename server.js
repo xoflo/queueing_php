@@ -128,7 +128,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
             if (diffSeconds > 3) {
               await con.query(
                 `UPDATE station
-                 SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = ''
+                 SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = '', ticketServingId = ''
                  WHERE id = ?`,
                 [s.id]
               );
