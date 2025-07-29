@@ -123,9 +123,6 @@ wss.on('connection', (ws) => {
   console.log('🔌 New client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
 
-  ws.on('message', async (message) => {
-    try {
-      const payload = JSON.parse(message);
 
       ws.on('message', async (message) => {
         try {
@@ -165,11 +162,6 @@ wss.on('connection', (ws) => {
           console.error('❌ Invalid JSON:', err);
         }
       });
-
-    } catch (err) {
-      console.error('❌ Invalid JSON:', err);
-    }
-  });
 
   ws.on('close', () => {
     console.log('❌ Client disconnected');
