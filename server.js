@@ -72,8 +72,8 @@ async function handleMessage(type, data, ws, batchMeta = null) {
         console.log("🔄 updateStation called with:", { id, ticketServing, ticketServingId });
 
         await con.query(
-          "UPDATE station SET ticketServing = ?, ticketServingId = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM station WHERE ticketServing = ?)",
-          [ticketServing, ticketServingId, id, ticketServing]
+          "UPDATE station SET ticketServing = ?, ticketServingId = ? WHERE id = ?",
+          [ticketServing, ticketServingId, id]
         );
 
         const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
@@ -125,10 +125,10 @@ async function handleMessage(type, data, ws, batchMeta = null) {
             const pingTime = new Date(s.sessionPing);
             const diffSeconds = (now - pingTime) / 1000;
 
-            if (diffSeconds > 3) {
+            if (diffSeconds > 10) {
               await con.query(
                 `UPDATE station
-                 SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = '', ticketServingId = ''
+                 SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = '', ticketServingId = null
                  WHERE id = ?`,
                 [s.id]
               );
