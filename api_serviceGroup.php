@@ -36,16 +36,16 @@ function handleGet($pdo) {
 }
 
 function handlePost($pdo, $input) {
-    $sql = "INSERT INTO servicegroup (name, assignedGroup, timeCreated) VALUES (:name, :assignedGroup, :timeCreated)";
+    $sql = "INSERT INTO servicegroup (name, assignedGroup, timeCreated, displayIndex) VALUES (:name, :assignedGroup, :timeCreated, :displayIndex)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'timeCreated' => $input['timeCreated']]);
+    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'timeCreated' => $input['timeCreated'], 'displayIndex' => $input['displayIndex']]);
     echo json_encode(['message' => 'Service Group created successfully']);
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE servicegroup SET name = :name, assignedGroup = :assignedGroup, timeCreated = :timeCreated, WHERE id = :id";
+    $sql = "UPDATE servicegroup SET name = :name, assignedGroup = :assignedGroup, timeCreated = :timeCreated, displayIndex = :displayIndex WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'timeCreated' => $input['timeCreated'], 'id' => $input['id']]);
+    $stmt->execute(['name' => $input['name'], 'assignedGroup' => $input['assignedGroup'], 'timeCreated' => $input['timeCreated'], 'displayIndex' => $input['displayIndex'], 'id' => $input['id']]);
     echo json_encode(['message' => 'Service Group updated successfully']);
 }
 
