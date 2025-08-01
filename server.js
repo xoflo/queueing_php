@@ -69,7 +69,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
       case 'updateStation': {
         const { ticketServing, ticketServingId, id } = data;
-        console.log("🔄 updateStation called with:", { id, ticketServing, ticketServingId });
+        console.log("updateStation called with:", { id, ticketServing, ticketServingId });
 
         await con.query(
           "UPDATE station SET ticketServing = ?, ticketServingId = ? WHERE id = ?",
@@ -78,7 +78,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
         const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
         broadcast({ type: "updateStation", data: updatedRows[0] || null });
-        console.log("✅ updateStation -> result:", updatedRows[0]);
+        console.log("updateStation -> result:", updatedRows[0]);
         break;
       }
 
@@ -87,7 +87,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
           const { id, sessionPing, inSession, userInSession } = data;
 
           if (!id) {
-            console.warn("⚠️ stationPing missing station ID");
+            console.warn("⚠stationPing missing station ID");
             break;
           }
 
@@ -103,9 +103,9 @@ async function handleMessage(type, data, ws, batchMeta = null) {
           const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
           broadcast({ type: "updateStation", data: updatedRows[0] || null });
 
-          console.log(`📶 Pinged: Station ${updatedRows[0].stationName}${updatedRows[0].stationNumber}`);
+          console.log(`Pinged: Station ${updatedRows[0].stationName}${updatedRows[0].stationNumber}`);
         } catch (err) {
-          console.error("❌ stationPing error:", err);
+          console.error("stationPing error:", err);
         }
         break;
       }
@@ -132,17 +132,22 @@ async function handleMessage(type, data, ws, batchMeta = null) {
                  WHERE id = ?`,
                 [s.id]
               );
-              console.log(`⛔ Session timeout: Station ${s.stationName}${s.stationNumber}`);
+              console.log(`Session timeout: Station ${s.stationName}${s.stationNumber}`);
+
+               const [updatedStation] = await con.query("SELECT * FROM station");
+               const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving'");
+
+               broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
             }
           }
 
           // Optional: broadcast updated station list if any were changed
-          const [updatedStations] = await con.query("SELECT * FROM station");
-          broadcast({ type: "updateStationBulk", data: updatedStations });
+         //  const [updatedStations] = await con.query("SELECT * FROM station");
+         //  broadcast({ type: "updateStationBulk", data: updatedStations });
 
-          console.log(`🔁 checkStationSessions -> active: ${activeStations.length}`);
+          console.log(`checkStationSessions -> active: ${activeStations.length}`);
         } catch (err) {
-          console.error("❌ checkStationSessions error:", err);
+          console.error("checkStationSessions error:", err);
         }
         break;
       }
@@ -169,10 +174,10 @@ async function handleMessage(type, data, ws, batchMeta = null) {
       }
 
       default:
-        console.warn("❓ Unknown type received:", type);
+        console.warn("Unknown type received:", type);
     }
   } catch (err) {
-    console.error(`❌ Error handling ${type}:`, err);
+    console.error(`Error handling ${type}:`, err);
   }
 }
 
@@ -184,7 +189,7 @@ function broadcast(payload) {
   });
 }
 
-// ✅ WebSocket Connection
+// WebSocket Connection
 wss.on('connection', (ws) => {
   console.log('🔌 New client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
@@ -218,18 +223,18 @@ wss.on('connection', (ws) => {
               ws.send(JSON.stringify({ type: 'batchStatus', status: 'success' }));
             } else {
               ws.send(JSON.stringify({ type: 'batchStatus', status: 'denied' }));
-              console.log("❌ Batch denied due to duplicate ticket ID and timing race");
+              console.log("Batch denied due to duplicate ticket ID and timing race");
             }
 
           } else if (payload.type && payload.data !== undefined) {
             await handleMessage(payload.type, payload.data, ws);
           }
         } catch (err) {
-          console.error('❌ Invalid JSON:', err);
+          console.error('Invalid JSON:', err);
         }
       });
 
   ws.on('close', () => {
-    console.log('❌ Client disconnected');
+    console.log('Client disconnected');
   });
 });
