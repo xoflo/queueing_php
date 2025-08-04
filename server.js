@@ -135,15 +135,11 @@ async function handleMessage(type, data, ws, batchMeta = null) {
               console.log(`Session timeout: Station ${s.stationName}${s.stationNumber}`);
 
                const [updatedStation] = await con.query("SELECT * FROM station");
-               const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving'");
+               const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving' AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')");
 
                broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
             }
           }
-
-          // Optional: broadcast updated station list if any were changed
-         //  const [updatedStations] = await con.query("SELECT * FROM station");
-         //  broadcast({ type: "updateStationBulk", data: updatedStations });
 
           console.log(`checkStationSessions -> active: ${activeStations.length}`);
         } catch (err) {
@@ -167,7 +163,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
       case 'updateDisplay': {
        const [updatedStation] = await con.query("SELECT * FROM station");
-       const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving'");
+       const [updatedTickets] = await con.query("SELECT * FROM ticket WHERE status = 'Serving' AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')");
 
        broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
       break;
