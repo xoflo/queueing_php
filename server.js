@@ -34,14 +34,14 @@ async function handleMessage(type, data, ws, batchMeta = null) {
       case 'getStation': {
         const [rows] = await con.query("SELECT * FROM station");
         broadcast({ type: "getStation", data: rows });
-        console.log("📥 getStation -> result:", rows);
+        // console.log("📥 getStation -> result:", rows);
         break;
       }
 
       case 'getTicket': {
         const [rows] = await con.query("SELECT * FROM ticket WHERE status IN ('Pending', 'Serving')");
         broadcast({ type: "getTicket", data: rows });
-        console.log("📥 getTicket -> result:", rows);
+        // console.log("📥 getTicket -> result:", rows);
         break;
       }
 
@@ -63,13 +63,13 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
         const [updatedRows] = await con.query("SELECT * FROM ticket WHERE id = ?", [id]);
         broadcast({ type: "updateTicket", data: updatedRows[0] || null });
-        console.log("✅ updateTicket -> updated ticket:", updatedRows[0]);
+        // console.log("✅ updateTicket -> updated ticket:", updatedRows[0]);
         break;
       }
 
       case 'updateStation': {
         const { ticketServing, ticketServingId, id } = data;
-        console.log("updateStation called with:", { id, ticketServing, ticketServingId });
+        // console.log("updateStation called with:", { id, ticketServing, ticketServingId });
 
         await con.query(
           "UPDATE station SET ticketServing = ?, ticketServingId = ? WHERE id = ?",
@@ -78,7 +78,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
         const [updatedRows] = await con.query("SELECT * FROM station WHERE id = ?", [id]);
         broadcast({ type: "updateStation", data: updatedRows[0] || null });
-        console.log("updateStation -> result:", updatedRows[0]);
+        // console.log("updateStation -> result:", updatedRows[0]);
         break;
       }
 
@@ -87,7 +87,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
           const { id, sessionPing, inSession, userInSession } = data;
 
           if (!id) {
-            console.warn("⚠stationPing missing station ID");
+            console.warn("stationPing missing station ID");
             break;
           }
 
