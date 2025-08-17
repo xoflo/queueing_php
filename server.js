@@ -32,6 +32,64 @@ const BATCH_WINDOW = 1000; // 1 second
 async function handleMessage(type, data, ws, batchMeta = null) {
   try {
     switch (type) {
+
+     case 'getActiveServices': {
+         try {
+             // Step 1: get active sessions (usernames)
+             const stations = await query("SELECT userInSession FROM station WHERE inSession = 1");
+             console.log("Stations in session:", stations);
+
+             if (!stations || stations.length === 0) {
+                 broadcast({ type: "getActiveServices", data: [] });
+                 break;
+             }
+
+             // Step 2: extract usernames
+             const usernames = stations.map(row => row.userInSession);
+             console.log("Usernames in session:", usernames);
+
+             // Step 3: fetch serviceType from user table using usernames
+             const users = await query(`SELECT username, serviceType FROM user WHERE username IN (?)`, [usernames]);
+             console.log("Users fetched:", users);
+
+             // Step 4: parse serviceType strings
+             let allServices = [];
+             for (const row of users) {
+                 if (!row.serviceType) continue;
+
+                 try {
+                     // If serviceType is valid JSON like '["License","Passport"]'
+                     const parsed = JSON.parse(row.serviceType);
+                     if (Array.isArray(parsed)) {
+                         allServices.push(...parsed);
+                     } else {
+                         allServices.push(parsed);
+                     }
+                 } catch (e) {
+                     // Otherwise, clean up strings like "[License]" or "[Passport, License]"
+                     const cleaned = row.serviceType.replace(/^\[|\]$/g, '');
+                     const parts = cleaned.split(',').map(s => s.trim()).filter(Boolean);
+                     allServices.push(...parts);
+                 }
+             }
+
+             // Step 5: deduplicate services
+             const uniqueServices = [...new Set(allServices)];
+             console.log("Unique services:", uniqueServices);
+
+             // Step 6: broadcast result
+             broadcast({ type: "getActiveServices", data: uniqueServices });
+
+         } catch (err) {
+             console.error("Error fetching active services:", err);
+             broadcast({ type: "getActiveServices", data: null, error: "Database error" });
+         }
+         break;
+     }
+
+
+
+
       case 'getStation': {
         const rows = await query("SELECT * FROM station");
         broadcast({ type: "getStation", data: rows });
@@ -39,10 +97,15 @@ async function handleMessage(type, data, ws, batchMeta = null) {
       }
 
       case 'getTicket': {
-        const rows = await query("SELECT * FROM ticket WHERE status IN ('Pending', 'Serving')");
+        const rows = await query(
+          `SELECT * FROM ticket
+           WHERE status IN ('Pending', 'Serving')
+             AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')`
+        );
         broadcast({ type: "getTicket", data: rows });
         break;
       }
+
 
       case 'updateTicket': {
         const {
