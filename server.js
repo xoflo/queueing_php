@@ -1,8 +1,7 @@
-// ✅ Import required packages
+
 const WebSocket = require('ws');
 const mysql = require('mysql2/promise');
 
-// ✅ MySQL Connection Pool
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
@@ -13,13 +12,34 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// ✅ Query helper
 async function query(sql, params) {
   const [rows] = await pool.query(sql, params);
   return rows;
 }
 
-// ✅ WebSocket Server
+
+async function logEvent(userId, user, state) {
+  try {
+
+    const now = new Date();
+    const ts =
+      now.getFullYear() + "-" +
+      String(now.getMonth() + 1).padStart(2, "0") + "-" +
+      String(now.getDate()).padStart(2, "0") + " " +
+      String(now.getHours()).padStart(2, "0") + ":" +
+      String(now.getMinutes()).padStart(2, "0") + ":" +
+      String(now.getSeconds()).padStart(2, "0");
+
+    await query(
+      "INSERT INTO userlog (userId, user, state, timestamp) VALUES (?, ?, ?, ?)",
+      [userId, user, state, ts]
+    );
+  } catch (err) {
+    console.error("Error logging event:", err);
+  }
+}
+
+
 const wss = new WebSocket.Server({ port: 3000 });
 console.log('🧼 WebSocket server running at ws://localhost:3000');
 
@@ -28,10 +48,31 @@ let lastBatchTime = 0;
 let lastSender = null;
 const BATCH_WINDOW = 1000; // 1 second
 
-// ✅ Async Handler Function
 async function handleMessage(type, data, ws, batchMeta = null) {
   try {
     switch (type) {
+     case 'identify': {
+       const { userId, userInSession } = data;
+       if (userId && userInSession) {
+         ws.userId = userId;
+         ws.username = userInSession;
+         await logEvent(ws.userId, ws.username, 1);
+         console.log(`User connected: ${ws.username} (${ws.userId})`);
+       }
+       break;
+     }
+
+
+     case 'exit': {
+       const { userId, userInSession } = data;
+       if (userId && userInSession) {
+         ws.userId = userId;
+         ws.username = userInSession;
+         await logEvent(ws.userId, ws.username, 0);
+         console.log(`User exited: ${ws.username} (${ws.userId})`);
+       }
+       break;
+     }
 
      case 'getActiveServices': {
          try {
@@ -86,9 +127,6 @@ async function handleMessage(type, data, ws, batchMeta = null) {
          }
          break;
      }
-
-
-
 
       case 'getStation': {
         const rows = await query("SELECT * FROM station");
@@ -241,9 +279,14 @@ function broadcast(payload) {
   });
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws) => {
   console.log('🔌 New client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
+
+
+    ws.userId = null;
+    ws.username = null;
+    ws.lastPing = null;
 
   ws.on('message', async (message) => {
     try {
@@ -281,7 +324,45 @@ wss.on('connection', (ws) => {
     }
   });
 
-  ws.on('close', () => {
+
+  ws.on('close', async () => {
     console.log('Client disconnected');
+    if (ws.username) {
+      await logEvent(ws.userId, ws.username, 3, ws.lastPing || new Date().toString());
+      console.log('Connection lost');
+    }
   });
 });
+
+setInterval(async () => {
+    try {
+      const stations = await query("SELECT * FROM station");
+      const now = new Date();
+      const activeStations = stations.filter(s => s.sessionPing && s.sessionPing !== "");
+
+      for (const s of activeStations) {
+        const pingTime = new Date(s.sessionPing);
+        const diffSeconds = (now - pingTime) / 1000;
+
+        if (diffSeconds > 20) {
+          await query(
+            `UPDATE station
+             SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = '', ticketServingId = null
+             WHERE id = ?`,
+            [s.id]
+          );
+          console.log(`Session timeout: Station ${s.stationName}${s.stationNumber}`);
+        }
+      }
+
+      const updatedStation = await query("SELECT * FROM station");
+      const updatedTickets = await query(
+        "SELECT * FROM ticket WHERE status = 'Serving' AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')"
+      );
+      broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
+
+      console.log(`serverStationCheck -> active: ${activeStations.length}`);
+    } catch (err) {
+      console.error("checkStationSessions error:", err);
+    }
+  }, 20000);
