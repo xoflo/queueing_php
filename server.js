@@ -41,7 +41,7 @@ async function logEvent(userId, user, state) {
 
 
 const wss = new WebSocket.Server({ port: 3000 });
-console.log('🧼 WebSocket server running at ws://localhost:3000');
+console.log('WebSocket server running at ws://localhost:3000');
 
 let lastBatch = null;
 let lastBatchTime = 0;
@@ -180,6 +180,9 @@ async function handleMessage(type, data, ws, batchMeta = null) {
       }
 
       case 'stationPing': {
+
+        broadcast({ type: "getActiveServices", data: null});
+
         try {
           const { id, sessionPing, inSession, userInSession } = data;
           if (!id) {
@@ -243,13 +246,13 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
       case 'createTicket': {
         broadcast({ type: "createTicket" });
-        console.log("📥 createTicket broadcasted");
+        console.log("createTicket broadcasted");
         break;
       }
 
       case 'refresh': {
         broadcast({ type: "refresh" });
-        console.log("📥 refresh broadcasted");
+        console.log("refresh broadcasted");
         break;
       }
 
@@ -280,7 +283,7 @@ function broadcast(payload) {
 }
 
 wss.on('connection', async (ws) => {
-  console.log('🔌 New client connected');
+  console.log('New client connected');
   ws.send(JSON.stringify({ type: 'ping', data: 'connected' }));
 
 
