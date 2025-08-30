@@ -8,12 +8,19 @@ const pool = mysql.createPool({
   password: "",
   database: "queueing",
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 50,
+  queueLimit: 500
 });
 
 async function query(sql, params) {
   const [rows] = await pool.query(sql, params);
+
+ if (rows.affectedRows !== undefined) {
+    console.log("Affected rows:", rows.affectedRows);
+  } else {
+    console.log("Returned rows:", rows.length);
+  }
+
   return rows;
 }
 
@@ -76,30 +83,27 @@ async function handleMessage(type, data, ws, batchMeta = null) {
 
      case 'getActiveServices': {
          try {
-             // Step 1: get active sessions (usernames)
+
              const stations = await query("SELECT userInSession FROM station WHERE inSession = 1");
-             console.log("Stations in session:", stations);
+             // console.log("Stations in session:", stations);
 
              if (!stations || stations.length === 0) {
                  broadcast({ type: "getActiveServices", data: [] });
                  break;
              }
 
-             // Step 2: extract usernames
              const usernames = stations.map(row => row.userInSession);
-             console.log("Usernames in session:", usernames);
+             // console.log("Usernames in session:", usernames);
 
-             // Step 3: fetch serviceType from user table using usernames
              const users = await query(`SELECT username, serviceType FROM user WHERE username IN (?)`, [usernames]);
-             console.log("Users fetched:", users);
+             // console.log("Users fetched:", users);
 
-             // Step 4: parse serviceType strings
              let allServices = [];
              for (const row of users) {
                  if (!row.serviceType) continue;
 
                  try {
-                     // If serviceType is valid JSON like '["License","Passport"]'
+
                      const parsed = JSON.parse(row.serviceType);
                      if (Array.isArray(parsed)) {
                          allServices.push(...parsed);
@@ -107,18 +111,16 @@ async function handleMessage(type, data, ws, batchMeta = null) {
                          allServices.push(parsed);
                      }
                  } catch (e) {
-                     // Otherwise, clean up strings like "[License]" or "[Passport, License]"
+
                      const cleaned = row.serviceType.replace(/^\[|\]$/g, '');
                      const parts = cleaned.split(',').map(s => s.trim()).filter(Boolean);
                      allServices.push(...parts);
                  }
              }
 
-             // Step 5: deduplicate services
              const uniqueServices = [...new Set(allServices)];
              console.log("Unique services:", uniqueServices);
 
-             // Step 6: broadcast result
              broadcast({ type: "getActiveServices", data: uniqueServices });
 
          } catch (err) {
@@ -162,7 +164,8 @@ async function handleMessage(type, data, ws, batchMeta = null) {
         );
 
         const updatedRows = await query("SELECT * FROM ticket WHERE id = ?", [id]);
-        broadcast({ type: "updateTicket", data: updatedRows[0] || null });
+        console.log(updatedRows[0]);
+
         break;
       }
 
@@ -262,7 +265,7 @@ async function handleMessage(type, data, ws, batchMeta = null) {
           "SELECT * FROM ticket WHERE status = 'Serving' AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')"
         );
 
-        broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
+        broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets]});
         break;
       }
 
@@ -331,41 +334,9 @@ wss.on('connection', async (ws) => {
   ws.on('close', async () => {
     console.log('Client disconnected');
     if (ws.username) {
-      await logEvent(ws.userId, ws.username, 3, ws.lastPing || new Date().toString());
+      await logEvent(ws.userId, ws.username, 3, new Date().toString());
       console.log('Connection lost');
     }
   });
 });
 
-setInterval(async () => {
-    try {
-      const stations = await query("SELECT * FROM station");
-      const now = new Date();
-      const activeStations = stations.filter(s => s.sessionPing && s.sessionPing !== "");
-
-      for (const s of activeStations) {
-        const pingTime = new Date(s.sessionPing);
-        const diffSeconds = (now - pingTime) / 1000;
-
-        if (diffSeconds > 20) {
-          await query(
-            `UPDATE station
-             SET inSession = 0, userInSession = '', sessionPing = '', ticketServing = '', ticketServingId = null
-             WHERE id = ?`,
-            [s.id]
-          );
-          console.log(`Session timeout: Station ${s.stationName}${s.stationNumber}`);
-        }
-      }
-
-      const updatedStation = await query("SELECT * FROM station");
-      const updatedTickets = await query(
-        "SELECT * FROM ticket WHERE status = 'Serving' AND LEFT(timeCreated, 10) = DATE_FORMAT(NOW(), '%Y-%m-%d')"
-      );
-      broadcast({ type: "updateDisplay", data: [updatedStation, updatedTickets] });
-
-      console.log(`serverStationCheck -> active: ${activeStations.length}`);
-    } catch (err) {
-      console.error("checkStationSessions error:", err);
-    }
-  }, 20000);

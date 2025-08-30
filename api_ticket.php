@@ -71,31 +71,35 @@ function handlePost($pdo, $input) {
 }
 
 function handlePut($pdo, $input) {
-    $sql = "UPDATE ticket SET timeCreated = :timeCreated, number = :number, serviceCode = :serviceCode, serviceType = :serviceType, userAssigned = :userAssigned, stationName = :stationName, stationNumber = :stationNumber, timeTaken = :timeTaken, timeDone = :timeDone, status = :status, log = :log, priority = :priority, priorityType = :priorityType, printStatus = :printStatus, callCheck = :callCheck, ticketName = :ticketName, blinker = :blinker, gender = :gender WHERE id = :id";
+    if (!isset($input['id'])) {
+        echo json_encode(['message' => 'Ticket ID is required']);
+        return;
+    }
+
+    $id = $input['id'];
+    unset($input['id']); // remove ID from fields to update
+
+    if (empty($input)) {
+        echo json_encode(['message' => 'No fields to update']);
+        return;
+    }
+
+    // Build dynamic SQL
+    $fields = [];
+    $params = [];
+    foreach ($input as $key => $value) {
+        $fields[] = "$key = :$key";
+        $params[$key] = $value;
+    }
+    $params['id'] = $id;
+
+    $sql = "UPDATE ticket SET " . implode(', ', $fields) . " WHERE id = :id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        'timeCreated' => $input['timeCreated'],
-        'number' => $input['number'],
-        'serviceCode' => $input['serviceCode'],
-        'serviceType' => $input['serviceType'],
-        'userAssigned' => $input['userAssigned'],
-        'stationName' => $input['stationName'],
-        'stationNumber' => $input['stationNumber'],
-        'timeTaken' => $input['timeTaken'],
-        'timeDone' => $input['timeDone'],
-        'status' => $input['status'],
-        'log' => $input['log'],
-        'priority' => $input['priority'],
-        'priorityType' => $input['priorityType'],
-        'printStatus' => $input['printStatus'],
-        'callCheck' => $input['callCheck'],
-        'ticketName' => $input['ticketName'],
-        'blinker' => $input['blinker'],
-        'gender' => $input['gender'],
-        'id' => $input['id']
-    ]);
+    $stmt->execute($params);
+
     echo json_encode(['message' => 'Ticket updated successfully']);
 }
+
 
 function handleDelete($pdo, $input) {
     $sql = "DELETE FROM ticket WHERE id = :id";
